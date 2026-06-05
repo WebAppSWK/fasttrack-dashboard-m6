@@ -283,6 +283,8 @@
     </div>
 
     <script>
+const apiKey = "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso";
+
         // --- 1. System Variables & API Setup ---
         let passCriteria = 50;
         let globalData = [];
@@ -892,10 +894,6 @@
         // --- 7. Gemini API Integration (Unified & Simplified) ---
         
         async function fetchGeminiResponse(promptText) {
-            // 🚨 กฎเหล็กของหน้า Preview: ต้องเว้นว่าง API Key และใช้โมเดลตัว Preview เท่านั้น
-            // 📌 แต่ก่อนเซฟไฟล์ไปขึ้น Github ให้ใส่คีย์ "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso" แทนที่เครื่องหมายคำพูดว่างๆ ได้เลยครับ
-            const apiKey = "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso"; 
-
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: promptText }] }],
