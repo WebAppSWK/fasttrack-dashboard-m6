@@ -892,9 +892,11 @@
         // --- 7. Gemini API Integration (Unified & Simplified) ---
         
         async function fetchGeminiResponse(promptText) {
-            // ระบบได้ฝัง API Key ล่าสุดที่ถูกต้องของคุณไว้ตรงนี้โดยตรง เพื่อให้ง่ายที่สุดครับ
-            let apiKey = ""; 
-            apiKey = "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso"; 
+            // 🛑 จุดสำคัญ: 
+            // 1. ตอนนี้ตั้งเป็น "" (ค่าว่าง) เพื่อให้หน้าต่างจำลอง (Preview) ด้านขวามือนี้ใช้งานได้
+            // 2. ⚠️ ก่อนอัปโหลดขึ้น GitHub ให้เปลี่ยนเป็นคีย์ของคุณ เช่น:
+            // const apiKey = "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso";
+            const apiKey = "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso"; 
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const payload = {
@@ -902,7 +904,6 @@
                 generationConfig: { temperature: 0.7 }
             };
 
-            // เพิ่มระบบลองใหม่ (Retry) อัตโนมัติหากการเชื่อมต่อมีปัญหา
             let retries = 3;
             let delay = 1000;
             
@@ -922,16 +923,15 @@
                     const resData = await response.json();
                     let text = resData.candidates?.[0]?.content?.parts?.[0]?.text || "";
                     
-                    // ปรับแต่งข้อความที่ได้จาก AI ให้แสดงผลสวยงาม
                     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                     text = text.replace(/\* (.*?)\n/g, '<li class="ml-4 list-disc mb-1">$1</li>');
                     text = text.replace(/\n/g, '<br>');
 
                     return text;
                 } catch (err) {
-                    if (i === retries) throw err; // หากลองครบแล้วยังไม่ได้ให้แสดง Error ทันที
+                    if (i === retries) throw err;
                     await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2; // ยืดเวลาการลองใหม่
+                    delay *= 2; 
                 }
             }
         }
