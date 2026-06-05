@@ -892,16 +892,16 @@
         // --- 7. Gemini API Integration (Unified & Simplified) ---
         
         async function fetchGeminiResponse(promptText) {
-            // ระบบได้ฝัง API Key ล่าสุดที่ถูกต้องของคุณไว้ตรงนี้โดยตรง เพื่อให้ง่ายที่สุดครับ
+            // 🚨 กฎเหล็กของหน้า Preview: ต้องเว้นว่าง API Key และใช้โมเดลตัว Preview เท่านั้น
+            // 📌 แต่ก่อนเซฟไฟล์ไปขึ้น Github ให้ใส่คีย์ "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso" แทนที่เครื่องหมายคำพูดว่างๆ ได้เลยครับ
             const apiKey = "AIzaSyCfI_OlBxmlOLTqqqWuwkaKP3GZTLggUso"; 
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: promptText }] }],
                 generationConfig: { temperature: 0.7 }
             };
 
-            // เพิ่มระบบลองใหม่ (Retry) อัตโนมัติหากการเชื่อมต่อมีปัญหา
             let retries = 3;
             let delay = 1000;
             
@@ -928,9 +928,9 @@
 
                     return text;
                 } catch (err) {
-                    if (i === retries) throw err; // หากลองครบแล้วยังไม่ได้ให้แสดง Error ทันที
+                    if (i === retries) throw err; 
                     await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2; // ยืดเวลาการลองใหม่
+                    delay *= 2; 
                 }
             }
         }
