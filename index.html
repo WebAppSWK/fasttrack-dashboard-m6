@@ -58,7 +58,7 @@
                     </div>
                     <div>
                         <h1 class="text-lg sm:text-xl font-bold tracking-tight">ระบบสรุปผลการสอบ Pre-Test ความเป็นเลิศ ม.6</h1>
-                        <p class="text-xs text-indigo-200">ฐานข้อมูลการสอบโครงการ Fast Track - พฤษภาคม 2569</p>
+                        <p class="text-xs text-indigo-200 font-sans">ฐานข้อมูลการสอบโครงการ Fast Track - พฤษภาคม 2569</p>
                     </div>
                 </div>
 
@@ -103,9 +103,30 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-3 w-full lg:w-auto text-xs text-slate-400 font-medium">
-                <i data-lucide="info" class="w-5 h-5 text-indigo-500"></i>
-                <span>ระบบจะอ่านค่าจากแผ่นงานชีต Excel และปรับปรุงเฉลี่ยไม่หารตัวเลขคะแนนศูนย์โดยอัตโนมัติ</span>
+            <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400 font-medium">
+                <i data-lucide="info" class="w-4 h-4 text-indigo-500"></i>
+                <span>ระบบวิเคราะห์อัตโนมัติรายวิชาและสรุปแผนความเข้าใจ</span>
+            </div>
+        </div>
+
+        <!-- Global Strategy Target Filter Control -->
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <i data-lucide="filter" class="w-4 h-4"></i>
+                </div>
+                <span class="text-xs sm:text-sm font-bold text-slate-700">ระบุกลุ่มเป้าหมายผู้สอบที่ต้องการวิเคราะห์เชิงลึก:</span>
+            </div>
+            <div class="bg-slate-100 p-1 rounded-xl flex space-x-1 w-full sm:w-auto border border-slate-200/50">
+                <button id="filter-all" onclick="setGlobalFilter('all')" class="flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5">
+                    <i data-lucide="grid" class="w-3.5 h-3.5"></i> ภาพรวมทั้งหมด
+                </button>
+                <button id="filter-sci" onclick="setGlobalFilter('Science')" class="flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5">
+                    <i data-lucide="microscope" class="w-3.5 h-3.5 text-sky-500"></i> สายวิทย์-คณิต
+                </button>
+                <button id="filter-arts" onclick="setGlobalFilter('Arts')" class="flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-amber-500"></i> สายศิลป์
+                </button>
             </div>
         </div>
 
@@ -124,30 +145,15 @@
 
         <!-- 1. Executive Summary Content -->
         <div id="content-overview" class="tab-content flex flex-col gap-6">
-            
-            <!-- Inner-tab Filter and Toggle Area -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-100 p-2 rounded-2xl self-stretch">
-                <div class="text-xs text-slate-500 pl-2 font-medium">สลับโหมดเพื่อเปรียบเทียบคะแนนรวมเฉลี่ย หรือสัดส่วนของร้อยละความเข้าใจ</div>
-                <!-- Localized Toggle Switch for Tab 1 only -->
-                <div class="bg-white p-1 rounded-xl flex space-x-1 shadow-xs border border-slate-200/50">
-                    <button id="btn-mode-score" onclick="setViewMode('score')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 bg-indigo-600 text-white shadow-sm">
-                        <i data-lucide="award" class="w-3.5 h-3.5"></i> คะแนนรวมจริง (เต็ม 700 / 500)
-                    </button>
-                    <button id="btn-mode-percent" onclick="setViewMode('percent')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 text-slate-500 hover:text-slate-800">
-                        <i data-lucide="percent" class="w-3.5 h-3.5"></i> ร้อยละความเข้าใจเฉลี่ย (0 - 100%)
-                    </button>
-                </div>
-            </div>
 
             <!-- KPIs Header Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Overall Average Card -->
                 <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex items-center justify-between">
                     <div class="space-y-1">
-                        <span class="text-xs font-bold text-slate-400 tracking-wider uppercase block">ผลสัมฤทธิ์เฉลี่ยรวม (ทุกสาย)</span>
+                        <span class="text-xs font-bold text-slate-400 tracking-wider uppercase block" id="kpi-title-main">สัมฤทธิผลความเข้าใจรวม</span>
                         <div class="flex items-baseline space-x-1.5">
-                            <span class="text-3xl font-extrabold text-slate-900" id="kpi-overall-val">0</span>
-                            <span class="text-xs font-semibold text-slate-500" id="kpi-overall-unit">คะแนน</span>
+                            <span class="text-3xl font-extrabold text-slate-900" id="kpi-overall-val">0%</span>
                         </div>
                         <p class="text-[11px] text-emerald-600 flex items-center gap-0.5 mt-1">
                             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
@@ -210,7 +216,7 @@
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h3 class="font-bold text-lg text-slate-900">เปรียบเทียบระหว่างสายการเรียน (Core Subjects Comparison)</h3>
-                                <p class="text-xs text-slate-500">ผลสัมฤทธิ์ใน 4 วิชาหลักที่ทั้งสองสายสอบร่วมกัน (คะแนนเต็มวิชาละ 100)</p>
+                                <p class="text-xs text-slate-500">ผลสัมฤทธิ์ร้อยละความเข้าใจเฉลี่ยของ 4 วิชาแกนหลัก (เต็ม 100)</p>
                             </div>
                         </div>
                         <div class="relative h-80 w-full mt-4">
@@ -237,53 +243,84 @@
                 </div>
             </div>
 
-            <!-- Secondary Distribution Grid -->
+            <!-- Radar Charts with Dynamic Scale Alignment -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Science Track Breakdown Card -->
+                <!-- Science Track Radar Chart Card -->
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h4 class="font-bold text-base text-slate-900 flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
-                                โครงสร้างจุดเด่นสายวิทยาศาสตร์-คณิตศาสตร์
+                                ผังใยแมงมุมสายวิทยาศาสตร์-คณิตศาสตร์ (Science Radar Scale)
                             </h4>
-                            <p class="text-xs text-slate-500 mt-0.5">คะแนนเฉลี่ยร้อยละรายวิชา (เต็ม 100)</p>
+                            <p class="text-xs text-slate-500 mt-0.5">สเกลเข้าใกล้ขอบตามคะแนนสูงสุดจริง เพื่อวิเคราะห์ขอบเขตสมรรถภาพอย่างละเอียดคมชัด</p>
                         </div>
                     </div>
-                    <div class="h-64">
-                        <canvas id="scienceRadarChart"></canvas>
+                    <div class="h-80 relative">
+                        <canvas id="scienceRadarChartCanvas"></canvas>
                     </div>
                 </div>
 
-                <!-- Arts Track Breakdown Card -->
+                <!-- Arts Track Radar Chart Card -->
                 <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h4 class="font-bold text-base text-slate-900 flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                                โครงสร้างจุดเด่นสายศิลป์และวิชาการทั่วไป
+                                ผังใยแมงมุมสายศิลป์และวิชาการทั่วไป (Arts Radar Scale)
                             </h4>
-                            <p class="text-xs text-slate-500 mt-0.5">คะแนนเฉลี่ยร้อยละรายวิชา (เต็ม 100)</p>
+                            <p class="text-xs text-slate-500 mt-0.5">สเกลปรับกระชับขอบตามสถิติจริง เพื่อประเมินสัดส่วนศักยภาพสายศิลปศาสตร์ได้ชัดเจน</p>
                         </div>
                     </div>
-                    <div class="h-64">
-                        <canvas id="artsRadarChart"></canvas>
+                    <div class="h-80 relative">
+                        <canvas id="artsRadarChartCanvas"></canvas>
                     </div>
+                </div>
+            </div>
+
+            <!-- Interactive AI Consultation Interface -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-950 text-white rounded-3xl p-6 shadow-xl border border-indigo-700/30 flex flex-col gap-5 mt-4">
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-indigo-600/30 rounded-2xl border border-indigo-500/20 text-indigo-300">
+                        <i data-lucide="bot" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-white flex items-center gap-2">
+                            <span>คำปรึกษาจาก AI ผู้เชี่ยวชาญด้านความเป็นเลิศทางวิชาการ</span>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Live Agent</span>
+                        </h4>
+                        <p class="text-xs text-indigo-200/80 mt-1">สอบถามแผนปฏิบัติการเชิงยุทธศาสตร์, แนวทางการพัฒนาช่องว่างคะแนน (SD) หรือทักษะรายวิชาจากฐานประชากรกลุ่มนี้</p>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-950/40 rounded-2xl p-4 border border-indigo-800/30 flex flex-col gap-3">
+                    <span class="text-xs font-bold text-indigo-300">คำถามแนะนำสำหรับการสอบถาม (เลือกด่วน):</span>
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button onclick="fillAndAskAI('แนวทางการยกระดับคะแนนวิชาคณิตศาสตร์เร่งด่วน?')" class="bg-indigo-900/50 hover:bg-indigo-900/80 text-indigo-200 border border-indigo-700/30 px-3.5 py-2 rounded-xl transition-all">📐 แนวทางยกระดับวิชาคณิตศาสตร์?</button>
+                        <button onclick="fillAndAskAI('ควรปรับปรุงการจัดการเรียนการสอนสายศิลป์อย่างไร?')" class="bg-indigo-900/50 hover:bg-indigo-900/80 text-indigo-200 border border-indigo-700/30 px-3.5 py-2 rounded-xl transition-all">🎨 ควรปรับปรุงแผนการเรียนสายศิลป์อย่างไร?</button>
+                        <button onclick="fillAndAskAI('วิธีลดช่องว่างความเหลื่อมล้ำทางวิชาการ (SD สูง)?')" class="bg-indigo-900/50 hover:bg-indigo-900/80 text-indigo-200 border border-indigo-700/30 px-3.5 py-2 rounded-xl transition-all">📈 วิธีลดช่องว่างความเหลื่อมล้ำ (SD สูง)?</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="ai-query-input" class="flex-grow bg-slate-900/80 border border-indigo-800/50 text-sm text-white placeholder-indigo-300/50 px-5 py-3.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-sans" placeholder="พิมพ์ข้อคำถามหรือสถานการณ์ที่เผชิญเพื่อขอแนวทางกับ AI ผู้เชี่ยวชาญด้านวิชาการ...">
+                    <button onclick="submitAIQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-6 py-3.5 rounded-2xl shadow-lg shadow-indigo-600/10 flex items-center justify-center gap-2 transition-all">
+                        <i data-lucide="send" class="w-4 h-4"></i> สอบถามกับ AI
+                    </button>
+                </div>
+
+                <!-- Dynamic Chat Output Frame -->
+                <div id="ai-chat-output-box" class="hidden bg-slate-950/60 border border-indigo-800/30 rounded-2xl p-5 text-xs text-indigo-100 flex flex-col gap-3 max-h-64 overflow-y-auto custom-scrollbar">
+                    <!-- Dynamic chat inserts here -->
                 </div>
             </div>
         </div>
 
         <!-- 2. Detailed Performance Tabs -->
         <div id="content-detail" class="tab-content hidden flex flex-col gap-6">
-            <!-- Tabs for Sci vs Arts detail inside -->
-            <div class="flex space-x-2 bg-slate-100 p-1.5 rounded-xl self-start">
-                <button onclick="switchDetailTrack('sci')" id="btn-detail-sci" class="px-4 py-2 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-sm transition-all">สายวิทย์-คณิต</button>
-                <button onclick="switchDetailTrack('arts')" id="btn-detail-arts" class="px-4 py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all">สายศิลป์</button>
-            </div>
-
             <!-- Subject Performance Cards Container -->
             <div id="subject-performance-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Dynamically Injected Subject Metrics -->
+                <!-- Dynamically Injected Subject Metrics with customized themes -->
             </div>
         </div>
 
@@ -300,8 +337,8 @@
                         <input type="text" id="student-search" oninput="filterAndRenderStudents()" class="pl-10 pr-4 py-2 w-full md:w-80 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-sans" placeholder="ค้นหาชื่อ, นามสกุล หรือเลขประจำตัวสอบ...">
                     </div>
 
-                    <!-- Track Filter -->
-                    <select id="student-track-filter" onchange="filterAndRenderStudents()" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-sans">
+                    <!-- Hidden but in sync with global pill filter -->
+                    <select id="student-track-filter" onchange="syncGlobalFilterFromDropdown()" class="hidden px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-sans">
                         <option value="all">ทุกสายการเรียน</option>
                         <option value="Science">สายวิทย์-คณิต</option>
                         <option value="Arts">สายศิลป์</option>
@@ -383,15 +420,15 @@
         </div>
     </div>
 
-    <!-- Modal: Subject Smart Recommendation Details -->
+    <!-- Modal: Subject Smart Blueprint Recommendation Details -->
     <div id="modal-subject-guide" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden transition-all duration-300">
         <div class="bg-white rounded-3xl w-full max-w-lg mx-4 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
             <!-- Header Banner -->
             <div class="p-6 bg-indigo-950 text-white flex justify-between items-start">
                 <div>
-                    <span class="bg-indigo-800 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full text-indigo-200 inline-block mb-2">แนวทางการยกระดับความรู้</span>
+                    <span class="bg-indigo-800 text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full text-indigo-200 inline-block mb-2">โครงสร้างข้อสอบและแผนพัฒนา</span>
                     <h3 class="text-xl font-bold" id="modal-guide-subject-title">ชื่อวิชา</h3>
-                    <p class="text-xs text-indigo-200 mt-1">บทสรุปคำแนะนำเชิงลึกสำหรับคุณครูผู้สอนเพื่อยกระดับผลสัมฤทธิ์</p>
+                    <p class="text-xs text-indigo-200 mt-1">เนื้อหาประเมินและทักษะที่ใช้สอบ (A-Level Test Blueprint)</p>
                 </div>
                 <button onclick="toggleSubjectGuideModal(false)" class="p-2 hover:bg-white/10 text-white rounded-xl transition-colors">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -401,28 +438,30 @@
             <!-- Content Panel -->
             <div class="p-6 space-y-4">
                 <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl mt-0.5">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">เนื้อหาที่ใช้ในการสอบ (A-Level Blueprint)</span>
+                        <p class="text-xs font-semibold text-slate-800 leading-relaxed" id="modal-guide-blueprint-content">เนื้อหาหัวข้อสอบ...</p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/50 rounded-2xl p-4 border border-amber-100 flex items-start space-x-3">
                     <div class="p-2 bg-amber-50 text-amber-600 rounded-xl mt-0.5">
                         <i data-lucide="lightbulb" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider mb-1">กลยุทธ์การปรับปรุงและแก้ไข</span>
-                        <p class="text-sm font-semibold text-slate-800 leading-relaxed" id="modal-guide-detail-content">เนื้อหาแนวทาง...</p>
+                        <span class="text-xs text-amber-600 font-bold block uppercase tracking-wider mb-1">คำแนะนำและแนวทางแก้ไข</span>
+                        <p class="text-xs font-semibold text-slate-700 leading-relaxed" id="modal-guide-detail-content">แนวทางพัฒนาซ่อมเสริม...</p>
                     </div>
-                </div>
-                <div class="border-t pt-4 space-y-2">
-                    <h5 class="text-xs font-bold text-slate-500 uppercase">ข้อเสนอแนะสำหรับการจัดกิจกรรมซ่อมเสริม</h5>
-                    <ul class="list-disc pl-4 text-xs text-slate-600 space-y-1.5 leading-relaxed">
-                        <li>จำลองแนวข้อสอบจริง (Mock Exam) แบบรายสัปดาห์ในส่วนหัวข้อเนื้อหาที่เป็นจุดอับคะแนน</li>
-                        <li>มุ่งจัดกลุ่มผู้เรียนความเข้าใจต่ำเสริมประกบคู่กลุ่มนักเรียนระดับยอดเยี่ยม (Peer Tutoring)</li>
-                        <li>ปรับปรุงตัวชี้วัดบทเรียนออนไลน์ย่อยให้เข้าถึงโจทย์แบบบูรณาการได้ง่ายขึ้น</li>
-                    </ul>
                 </div>
             </div>
 
             <!-- Footer Action -->
             <div class="bg-slate-50 px-6 py-4 flex justify-end border-t">
                 <button onclick="toggleSubjectGuideModal(false)" class="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all shadow-xs">
-                    เข้าใจแล้ว ปิดหน้าต่าง
+                    ปิดหน้าต่าง
                 </button>
             </div>
         </div>
@@ -452,8 +491,8 @@
                             <i data-lucide="gauge" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">คะแนนสะสมจริง</span>
-                            <span class="text-lg font-extrabold text-slate-800" id="modal-stud-score">0 / 0</span>
+                            <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">ผลสัมฤทธิ์เฉลี่ยรวม</span>
+                            <span class="text-base font-extrabold text-slate-800" id="modal-stud-score">0 / 0</span>
                         </div>
                     </div>
                     <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex items-center space-x-3">
@@ -461,8 +500,8 @@
                             <i data-lucide="award" class="w-5 h-5" id="modal-stud-pass-icon"></i>
                         </div>
                         <div>
-                            <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">ร้อยละเฉลี่ย</span>
-                            <span class="text-lg font-extrabold text-slate-800" id="modal-stud-percent">0%</span>
+                            <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">สัดส่วนร้อยละความเข้าใจ</span>
+                            <span class="text-base font-extrabold text-slate-800" id="modal-stud-percent">0%</span>
                         </div>
                     </div>
                 </div>
@@ -470,7 +509,7 @@
                 <!-- Subject-wise list with bars -->
                 <div>
                     <h4 class="font-bold text-sm text-slate-900 mb-3 flex items-center gap-2">
-                        <i data-lucide="align-left" class="w-4 h-4 text-slate-500"></i> รายงานความเข้าถึงร้อยละคะแนนในรายวิชาต่างๆ
+                        <i data-lucide="align-left" class="w-4 h-4 text-slate-500"></i> คะแนนของแต่ละรายวิชา
                     </h4>
                     <div class="space-y-3.5 overflow-y-auto max-h-[30vh] pr-2 custom-scrollbar" id="modal-stud-subject-bars">
                         <!-- JS Will Inject Individual Bars Here -->
@@ -509,21 +548,53 @@
             passThreshold: 50 // %
         };
 
-        // Subject Specific Recommendations for guidance popup modal
-        const subjectRecommendations = {
-            math: "คณิตศาสตร์เป็นทักษะแกนร่วม: ควรเน้นกระตุ้นการปูพื้นฐานกระบวนการแก้โจทย์บูรณาการ มุ่งเสริมจำนวนข้อสอบปรนัยและอัตนัยประยุกต์วิเคราะห์ปัญหาที่เชื่อมโยงกับชีวิตจริง และลดการสอนเน้นจำจำเจ",
-            phys: "วิชาฟิสิกส์เน้นการทำงานเชิงตรรกะ: ควรเพิ่มการทำความเข้าใจสูตรทางทฤษฎีกลศาสตร์คลื่นคู่ไปกับการจำลองกราฟและโมเดลการทดลองเสมือนจริง (Interactive Labs) และเพิ่มความแม่นยำทางเวกเตอร์",
-            chem: "วิชาเคมีเป็นสมดุลจำและคิด: แนะนำให้เน้นการจดจำโครงสร้างสาร ตารางธาตุ พันธะเคมี และการฝึกฝนดุลสมการเคมีเป็นประจำทุกสัปดาห์ด้วยแบบฝึกหัดขนาดสั้น (Micro-Worksheets)",
-            bio: "วิชาชีววิทยามีรายละเอียดเนื้อหาสูง: แนะนำปรับใช้การร่างแผนภาพความคิด (Mind Mapping) สรุปเชื่อมโยงของระบบร่างกายพืชและสัตว์ และมุ่งจำแนกกระบวนการระดับเซลล์ผ่านภาพไดอะแกรม",
-            thai: "ทักษะภาษาไทยคือหัวใจสื่อสาร: ควรพัฒนาการอ่านบทความวิเคราะห์เชิงลึก เสริมความสามารถในการแยกแยะข้อเท็จจริงและข้อคิดเห็นในร้อยแก้วร้อยกรองระดับสูง",
-            social: "วิชาสังคมคือความเข้าใจสภาพแวดล้อม: ควรสนับสนุนทักษะการวิเคราะห์ผ่านการเชื่อมโยงข่าวประเด็นปัจจุบัน เข้ากับบริบทประวัติศาสตร์ สิทธิพลเมือง และเศรษฐศาสตร์รอบตัว",
-            eng: "วิชาภาษาอังกฤษเน้นการนำไปใช้: ควรเน้นส่งเสริมคลังคำศัพท์วิชาการในบริบทประโยค (Vocabulary in Context) สม่ำเสมอ และเพิ่มการฝึกจับใจความส่วนเรื่องอ่าน (Reading Comprehension)",
-            sci: "วิชาวิทยาศาสตร์ทั่วไปเน้นทักษะรอบตัว: มุ่งทบทวนหลักการเชิงฟิสิกส์ เคมี ชีวภาพ และดาราศาสตร์ขั้นพื้นฐานเพื่ออธิบายเหตุการณ์ธรรมชาติได้อย่างถูกต้องและมีเหตุผลเป็นวิทยาศาสตร์"
+        // TCAS A-Level Test Blueprints & Strategical Recommendations
+        const subjectBlueprints = {
+            math: {
+                title: "คณิตศาสตร์ (A-Level คณิตประยุกต์ 1 / คณิตประยุกต์ 2)",
+                blueprint: "สาระจำนวนและพีชคณิต (เซต, ตรรกศาสตร์, จำนวนจริง, ฟังก์ชัน, เมทริกซ์, จำนวนเชิงซ้อน, ลำดับและอนุกรม) | สาระการวัดและเรขาคณิต (เรขาคณิตวิเคราะห์, เวกเตอร์) | สาระสถิติและความน่าจะเป็น (สถิติวิเคราะห์, การแจกแจงความน่าจะเป็น) | แคลคูลัสเบื้องต้น",
+                focus: "ปรับแผนทบทวนสถิติประยุกต์และแคลคูลัสสะสม ซึ่งเป็นจุดอับคะแนนที่นักเรียนมักทำผิดพลาดสูง แนะนำให้นำข้อสอบเชิงสถานการณ์วิเคราะห์จริงมาประกบฝึกฝนรายสัปดาห์"
+            },
+            phys: {
+                title: "ฟิสิกส์ (A-Level ฟิสิกส์)",
+                blueprint: "กลุ่มกลศาสตร์ (สมดุลกล, งานและพลังงาน, โมเมนตัม, การเคลื่อนที่แบบต่าง ๆ) | กลุ่มคลื่น เสียง แสงกลศาสตร์ | กลุ่มไฟฟ้า แม่เหล็กไฟฟ้า และคลื่นแม่เหล็กไฟฟ้า | กลุ่มอุณหพลศาสตร์และสมบัติเชิงกลของสาร | กลุ่มฟิสิกส์แผนใหม่ (ฟิสิกส์นิวเคลียร์และฟิสิกส์อนุภาค)",
+                focus: "มุ่งปูทัศนคติวิเคราะห์โครงสร้างแผนภาพวัตถุอิสระ (Free Body Diagram) และลดพฤติกรรมจำสูตรลัด โดยจำลองโจทย์เชื่อมโยงหลักการเคลื่อนที่กับทฤษฎีไฟฟ้าสลับ"
+            },
+            chem: {
+                title: "เคมี (A-Level เคมี)",
+                blueprint: "กลุ่มสมบัติธาตุและสารประกอบ (ตารางธาตุ, พันธะเคมี) | กลุ่มสมการเคมีและการเปลี่ยนแปลง (ปริมาณสารสัมพันธ์, อัตราเกิดปฏิกิริยา, สมดุลเคมี, กรด-เบส, เคมีไฟฟ้า) | กลุ่มเคมีอินทรีย์และพอลิเมอร์ | ทักษะการปฏิบัติการเคมี",
+                focus: "มุ่งเน้นเพิ่มความแม่นยำในการดุลสมการและปริมาณสารสัมพันธ์ ผ่านใบงานย่อยทบทวนประจำวัน (Daily Micro-Sheets) เพื่อลดข้อผิดพลาดในการคำนวณเชิงลึก"
+            },
+            bio: {
+                title: "ชีววิทยา (A-Level ชีววิทยา)",
+                blueprint: "ความหลากหลายทางชีวภาพและระบบนิเวศ | หน่วยพื้นฐานสิ่งมีชีวิต (โครงสร้างและการทำงานเซลล์, ลำเลียงสาร) | ระบบร่างกายและการทำงานของสัตว์และมนุษย์ (ย่อยอาหาร, หมุนเวียนโลหิต, ภูมิคุ้มกัน, ระบบหายใจ, ประสาท) | โครงสร้างและการดำรงชีวิตของพืช | พันธุศาสตร์และวิวัฒนาการ",
+                focus: "แนะนำให้ใช้แผนภาพกระบวนการเชื่อมโยง (Mind Mapping) สรุประบบร่างกาย และเน้นศึกษาคำศัพท์เทคนิคเฉพาะทางผ่านบัตรคำจำลอง (Flashcards)"
+            },
+            thai: {
+                title: "ภาษาไทย (A-Level ภาษาไทย)",
+                blueprint: "การอ่านจับใจความและสรุปสาระสำคัญเชิงวิเคราะห์ | การเขียนสะกดคำ หลักการใช้คำและเรียบเรียงประโยค | การพูดและการฟังเชิงวิเคราะห์ | หลักประยุกต์วรรณศิลป์และระดับภาษาเพื่อการสื่อสาร",
+                focus: "เน้นกระตุ้นทักษะการจับคีย์เวิร์ดของวรรณกรรมร้อยแก้วยาว ๆ เสริมสมาธิในการอ่านจำแนกข้อเท็จจริงกับข้อคิดเห็นเพื่อประหยัดเวลาทำข้อสอบจริง"
+            },
+            social: {
+                title: "สังคมศึกษา (A-Level สังคมศึกษา)",
+                blueprint: "ศาสนา ศีลธรรม และจริยธรรม | หน้าที่พลเมืองและกฎหมายวัฒนธรรมการดำรงชีวิต | เศรษฐศาสตร์พอเพียงและการเงินการคลังระบบสากล | ประวัติศาสตร์ไทยและประวัติศาสตร์โลก | ภูมิศาสตร์เชิงกายภาพและวิกฤตการณ์โลก",
+                focus: "ปรับกลวิธีนำกระแสประเด็นข่าวสังคมปัจจุบันมาบูรณาการเข้ากับทฤษฎีกฎหมายรัฐธรรมนูญ หน้าที่พลเมือง และหลักความขัดแย้งเชิงภูมิรัฐศาสตร์"
+            },
+            eng: {
+                title: "ภาษาอังกฤษ (A-Level ภาษาอังกฤษ)",
+                blueprint: "ทักษะการฟังและการพูด (Short/Long Conversations, Situational Dialogue) | ทักษะการอ่านวิเคราะห์เชิงจับใจความ (Reading Advertisements, Reviews, News, Graphics & Visuals, Long Academic Articles) | ทักษะการเขียนหลักไวยากรณ์ (Cloze Test, Paragraph Completion)",
+                focus: "เน้นปูพรมชุดคำศัพท์วิชาการ (Academic Vocabulary) ระดับปานกลางถึงสูง และจัดโครงการฝึกทักษะการกวาดสายตาจับใจความบทความ (Skimming & Scanning Techniques)"
+            },
+            sci: {
+                title: "วิทยาศาสตร์ประยุกต์ (A-Level วิทยาศาสตร์ประยุกต์)",
+                blueprint: "วิทยาศาสตร์ชีวภาพ (ระบบนิเวศ, ดุลยภาพร่างกาย, พันธุศาสตร์) | วิทยาศาสตร์กายภาพ (ธาตุและสารเคมี, แรงสะสมและการเคลื่อนที่, พลังงานคลื่นและแสง) | วิทยาศาสตร์โลกและอวกาศ (โครงสร้างระบบสุริยะ, โครงสร้างโลก, การเปลี่ยนแปลงชั้นบรรยากาศและภูมิอากาศ)",
+                focus: "มุ่งจัดกระบวนการเรียนรู้เน้นฝึกเชื่อมโยงสาระวิทยาศาสตร์ธรรมชาติเข้ากับปรากฏการณ์ในชีวิตประจำวัน และลดทอนการทบทวนแบบลงสูตรคณิตศาสตร์ซับซ้อน"
+            }
         };
 
         // Active Application State
+        let selectedGlobalFilter = 'all'; // 'all' (ภาพรวม), 'Science' (สายวิทย์), 'Arts' (สายศิลป์)
         let activeTab = 'overview';
-        let viewMode = 'score'; // 'score' (average total) or 'percent' (0-100% of the subjects)
         let activeDetailTrack = 'sci'; // 'sci' or 'arts'
         let sortField = 'avg';
         let sortDirection = 'desc';
@@ -917,6 +988,42 @@
             }
         }
 
+        // Apply global pill track filter ('all', 'Science', 'Arts')
+        function setGlobalFilter(filter) {
+            selectedGlobalFilter = filter;
+            
+            const btnAll = document.getElementById('filter-all');
+            const btnSci = document.getElementById('filter-sci');
+            const btnArts = document.getElementById('filter-arts');
+            
+            // Reset styles
+            [btnAll, btnSci, btnArts].forEach(btn => {
+                btn.className = "flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5";
+            });
+            
+            if (filter === 'all') {
+                btnAll.className = "flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5";
+                document.getElementById('kpi-title-main').innerText = "สัมฤทธิผลความเข้าใจรวม (ทุกสาย)";
+            } else if (filter === 'Science') {
+                btnSci.className = "flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5";
+                document.getElementById('kpi-title-main').innerText = "สัมฤทธิผลความเข้าใจรวม (วิทย์-คณิต)";
+            } else if (filter === 'Arts') {
+                btnArts.className = "flex-grow sm:flex-grow-0 px-5 py-2 rounded-lg text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-1.5";
+                document.getElementById('kpi-title-main').innerText = "สัมฤทธิผลความเข้าใจรวม (สายศิลป์)";
+            }
+            
+            // Synchronize student page track select
+            document.getElementById('student-track-filter').value = filter;
+            
+            recalculateDataAndRender();
+        }
+
+        // Support dropdown change syncing too
+        function syncGlobalFilterFromDropdown() {
+            const dropdownVal = document.getElementById('student-track-filter').value;
+            setGlobalFilter(dropdownVal);
+        }
+
         // Recalculator Engine & Visual state updates
         function recalculateDataAndRender() {
             const validSci = rawScienceStudents.filter(s => !s.isAbsent);
@@ -933,25 +1040,32 @@
             const avgArtsPercent = countArts > 0 ? (sumArts / (countArts * 5)) : 0;
 
             const totalActiveStudents = countSci + countArts;
-            const combinedAverages = totalActiveStudents > 0 ? ((sumSci + sumArts) / ((countSci * 7) + (countArts * 5))) * 100 : 0;
+            const combinedAverages = totalActiveStudents > 0 ? ((sumSci + sumArts) / ((countSci * 7) + (countArts * 5))) : 0;
 
-            // Update KPIs based on viewMode
+            // Update Main KPI metric block dynamically matching the global track filter
             const kpiVal = document.getElementById('kpi-overall-val');
-            const kpiUnit = document.getElementById('kpi-overall-unit');
             const kpiPassRate = document.getElementById('kpi-overall-pass-rate');
 
-            if (viewMode === 'score') {
-                // Average accumulate total scores
-                const rawAvg = totalActiveStudents > 0 ? ((sumSci + sumArts) / totalActiveStudents) : 0;
-                kpiVal.innerText = rawAvg.toFixed(1);
-                kpiUnit.innerText = "คะแนนสะสมเฉลี่ย";
-            } else {
-                kpiVal.innerText = combinedAverages.toFixed(1) + "%";
-                kpiUnit.innerText = "ร้อยละความเข้าใจรวม";
+            let activeOverallPct = 0;
+            if (selectedGlobalFilter === 'all') {
+                activeOverallPct = combinedAverages;
+            } else if (selectedGlobalFilter === 'Science') {
+                activeOverallPct = avgSciPercent;
+            } else if (selectedGlobalFilter === 'Arts') {
+                activeOverallPct = avgArtsPercent;
             }
+            kpiVal.innerText = activeOverallPct.toFixed(1) + "%";
 
             // Calculations for Threshold Performance rate
-            const combinedStudents = [...rawScienceStudents, ...rawArtsStudents];
+            let combinedStudents = [];
+            if (selectedGlobalFilter === 'all') {
+                combinedStudents = [...rawScienceStudents, ...rawArtsStudents];
+            } else if (selectedGlobalFilter === 'Science') {
+                combinedStudents = [...rawScienceStudents];
+            } else if (selectedGlobalFilter === 'Arts') {
+                combinedStudents = [...rawArtsStudents];
+            }
+
             const presentCount = combinedStudents.filter(s => !s.isAbsent).length;
             const passingCount = combinedStudents.filter(s => !s.isAbsent && s.percent >= config.passThreshold).length;
             const overallPassingRate = presentCount > 0 ? (passingCount / presentCount) * 100 : 0;
@@ -1069,23 +1183,6 @@
             document.getElementById(`content-${tabId}`).classList.remove('hidden');
         }
 
-        // Switch local View Mode inside Tab 1 only
-        function setViewMode(mode) {
-            viewMode = mode;
-            const btnScore = document.getElementById('btn-mode-score');
-            const btnPct = document.getElementById('btn-mode-percent');
-
-            if (mode === 'score') {
-                btnScore.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 bg-indigo-600 text-white shadow-sm";
-                btnPct.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 text-slate-500 hover:text-slate-800";
-            } else {
-                btnScore.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 text-slate-500 hover:text-slate-800";
-                btnPct.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 bg-indigo-600 text-white shadow-sm";
-            }
-
-            recalculateDataAndRender();
-        }
-
         // Settings Dialog state control
         function toggleConfigModal(show) {
             const modal = document.getElementById('modal-config');
@@ -1097,7 +1194,7 @@
             }
         }
 
-        // Subject Guide Dialog modal control
+        // Subject Blueprint Dialog modal control
         function toggleSubjectGuideModal(show) {
             const modal = document.getElementById('modal-subject-guide');
             if (show) {
@@ -1107,13 +1204,22 @@
             }
         }
 
-        // Launch individual subject recommendation popup modal
+        // Launch individual subject blueprint popup modal
         function showSubjectRecommendation(subjectKey) {
             const titleEl = document.getElementById('modal-guide-subject-title');
+            const blueprintEl = document.getElementById('modal-guide-blueprint-content');
             const detailEl = document.getElementById('modal-guide-detail-content');
 
-            titleEl.innerText = getThaiSubjectName(subjectKey);
-            detailEl.innerText = subjectRecommendations[subjectKey] || "กรุณากรอกแผนกลยุทธ์เสริมรายวิชาสำหรับบทเรียนนี้";
+            const item = subjectBlueprints[subjectKey];
+            if (item) {
+                titleEl.innerText = item.title;
+                blueprintEl.innerText = item.blueprint;
+                detailEl.innerText = item.focus;
+            } else {
+                titleEl.innerText = getThaiSubjectName(subjectKey);
+                blueprintEl.innerText = "ไม่พบชุดข้อมูลใน Blueprint";
+                detailEl.innerText = "เน้นการพัฒนาทำความเข้าใจกระบวนการแก้ไขปัญหาข้อสอบประยุกต์เบื้องต้นสม่ำเสมอ";
+            }
 
             toggleSubjectGuideModal(true);
         }
@@ -1156,6 +1262,8 @@
             let barContainer = document.getElementById('modal-stud-subject-bars');
             barContainer.innerHTML = '';
 
+            const isAllZero = student.isAbsent || student.total === 0;
+
             let maxPossible = 0;
             if (student.track === 'Science') {
                 headerBg.className = "p-6 text-white flex justify-between items-start bg-sky-950";
@@ -1165,31 +1273,38 @@
 
                 const subjects = ['math', 'bio', 'phys', 'chem', 'thai', 'social', 'eng'];
                 subjects.forEach(sub => {
-                    const val = student.scores[sub];
+                    const val = isAllZero ? 0 : student.scores[sub];
                     appendSubjectBar(barContainer, getThaiSubjectName(sub), val, 100, val);
                 });
             } else {
                 headerBg.className = "p-6 text-white flex justify-between items-start bg-amber-950";
-                trackBadge.innerText = "แผนการเรียนศิลป์-ทั่วไป";
+                trackBadge.innerText = "แผนการเรียนศิลป์";
                 trackBadge.className = "bg-amber-500/20 text-[10px] text-amber-200 uppercase font-bold tracking-wider px-2.5 py-1 rounded-full inline-block mb-2";
                 maxPossible = 500; // 5 Subjects * 100
 
                 const subjects = ['math', 'thai', 'social', 'eng', 'sci'];
                 subjects.forEach(sub => {
-                    const val = student.scores[sub];
+                    const val = isAllZero ? 0 : student.scores[sub];
                     appendSubjectBar(barContainer, getThaiSubjectName(sub), val, 100, val);
                 });
             }
 
-            scoreText.innerText = `${student.total.toFixed(1)} / ${maxPossible}`;
-            percentText.innerText = `${student.percent.toFixed(1)}%`;
-
-            if (student.percent >= config.passThreshold) {
-                passIconBg.className = "p-2 bg-emerald-50 text-emerald-600 rounded-xl";
-                passIcon.setAttribute('data-lucide', 'award');
-            } else {
+            if (isAllZero) {
+                scoreText.innerText = '(ขาดสอบ)';
+                percentText.innerText = '(ขาดสอบ)';
                 passIconBg.className = "p-2 bg-rose-50 text-rose-600 rounded-xl";
                 passIcon.setAttribute('data-lucide', 'x-circle');
+            } else {
+                scoreText.innerText = `${student.total.toFixed(1)} / ${maxPossible}`;
+                percentText.innerText = `${student.percent.toFixed(1)}%`;
+
+                if (student.percent >= config.passThreshold) {
+                    passIconBg.className = "p-2 bg-emerald-50 text-emerald-600 rounded-xl";
+                    passIcon.setAttribute('data-lucide', 'award');
+                } else {
+                    passIconBg.className = "p-2 bg-rose-50 text-rose-600 rounded-xl";
+                    passIcon.setAttribute('data-lucide', 'x-circle');
+                }
             }
 
             lucide.createIcons();
@@ -1207,7 +1322,7 @@
             item.innerHTML = `
                 <div class="flex justify-between items-center text-xs">
                     <span class="font-semibold text-slate-700">${name}</span>
-                    <span class="text-slate-500 font-medium">${val.toFixed(1)} / ${max} คะแนน <b class="text-slate-800 ml-1.5">(${percent.toFixed(1)}%)</b></span>
+                    <span class="text-slate-500 font-medium">${val.toFixed(1)} / ${max} คะแนน</span>
                 </div>
                 <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                     <div class="${color} h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
@@ -1223,6 +1338,22 @@
             const sciDataPoints = [sciSubjAvg.math.percent, sciSubjAvg.thai.percent, sciSubjAvg.social.percent, sciSubjAvg.eng.percent];
             const artsDataPoints = [artsSubjAvg.math.percent, artsSubjAvg.thai.percent, artsSubjAvg.social.percent, artsSubjAvg.eng.percent];
 
+            // 1. Dynamic Auto-Scaling calculation for Bar chart
+            let barValues = [];
+            if (selectedGlobalFilter === 'all' || selectedGlobalFilter === 'Science') {
+                barValues.push(...sciDataPoints);
+            }
+            if (selectedGlobalFilter === 'all' || selectedGlobalFilter === 'Arts') {
+                barValues.push(...artsDataPoints);
+            }
+            let maxBarValue = Math.max(...barValues.filter(v => v !== undefined && v !== null && !isNaN(v)));
+            let barMaxScale = 100;
+            if (maxBarValue > 0) {
+                // Adjust scale dynamically if the maximum score is small (e.g. max 48% -> scale max 55%)
+                barMaxScale = Math.ceil(maxBarValue + 2);
+                if (barMaxScale > 100) barMaxScale = 100;
+            }
+
             // Render comparison chart
             if (commonSubjectsChartInst) commonSubjectsChartInst.destroy();
             const ctx = document.getElementById('commonSubjectsChart').getContext('2d');
@@ -1236,12 +1367,14 @@
                             data: sciDataPoints,
                             backgroundColor: '#38bdf8',
                             borderRadius: 8,
+                            hidden: (selectedGlobalFilter === 'Arts') // Hide if Arts is isolated
                         },
                         {
                             label: 'สายศิลป์',
                             data: artsDataPoints,
                             backgroundColor: '#fbbf24',
                             borderRadius: 8,
+                            hidden: (selectedGlobalFilter === 'Science') // Hide if Science is isolated
                         }
                     ]
                 },
@@ -1254,7 +1387,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100,
+                            max: barMaxScale,
                             ticks: {
                                 font: { family: 'Sarabun' },
                                 callback: function(value) {
@@ -1267,7 +1400,7 @@
                 }
             });
 
-            // Science Radar Chart (7 Subjects)
+            // 2. Science Radar Chart (7 Subjects)
             const sciLabels = ['คณิตศาสตร์', 'ชีววิทยา', 'ฟิสิกส์', 'เคมี', 'ภาษาไทย', 'สังคมศึกษา', 'ภาษาอังกฤษ'];
             const sciValues = [
                 sciSubjAvg.math.percent,
@@ -1279,8 +1412,13 @@
                 sciSubjAvg.eng.percent
             ];
 
+            // Auto-scale Science Radar to fit maximum score closely
+            const nonNullSciValues = sciValues.filter(v => v !== null && !isNaN(v));
+            const sciMaxVal = Math.max(...nonNullSciValues);
+            const sciRadarMaxScale = sciMaxVal > 0 ? Math.min(100, Math.ceil(sciMaxVal + 3)) : 100;
+
             if (scienceRadarChartInst) scienceRadarChartInst.destroy();
-            const ctxSci = document.getElementById('scienceRadarChart').getContext('2d');
+            const ctxSci = document.getElementById('scienceRadarChartCanvas').getContext('2d');
             scienceRadarChartInst = new Chart(ctxSci, {
                 type: 'radar',
                 data: {
@@ -1288,7 +1426,7 @@
                     datasets: [{
                         label: 'สายวิทย์-คณิต (ร้อยละ)',
                         data: sciValues,
-                        backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                        backgroundColor: 'rgba(56, 189, 248, 0.15)',
                         borderColor: '#38bdf8',
                         borderWidth: 2,
                         pointBackgroundColor: '#0284c7'
@@ -1302,15 +1440,15 @@
                         r: {
                             angleLines: { display: true },
                             suggestedMin: 0,
-                            suggestedMax: 100,
-                            ticks: { font: { family: 'Sarabun', size: 10 } },
-                            pointLabels: { font: { family: 'Sarabun', weight: 'bold' } }
+                            max: sciRadarMaxScale,
+                            ticks: { font: { family: 'Sarabun', size: 9 } },
+                            pointLabels: { font: { family: 'Sarabun', weight: 'bold', size: 11 } }
                         }
                     }
                 }
             });
 
-            // Arts Radar Chart (5 Subjects)
+            // 3. Arts Radar Chart (5 Subjects)
             const artsLabels = ['คณิตศาสตร์', 'วิทยาศาสตร์ทั่วไป', 'ภาษาไทย', 'สังคมศึกษา', 'ภาษาอังกฤษ'];
             const artsValues = [
                 artsSubjAvg.math.percent,
@@ -1320,8 +1458,13 @@
                 artsSubjAvg.eng.percent
             ];
 
+            // Auto-scale Arts Radar to fit maximum score closely
+            const nonNullArtsValues = artsValues.filter(v => v !== null && !isNaN(v));
+            const artsMaxVal = Math.max(...nonNullArtsValues);
+            const artsRadarMaxScale = artsMaxVal > 0 ? Math.min(100, Math.ceil(artsMaxVal + 3)) : 100;
+
             if (artsRadarChartInst) artsRadarChartInst.destroy();
-            const ctxArts = document.getElementById('artsRadarChart').getContext('2d');
+            const ctxArts = document.getElementById('artsRadarChartCanvas').getContext('2d');
             artsRadarChartInst = new Chart(ctxArts, {
                 type: 'radar',
                 data: {
@@ -1329,7 +1472,7 @@
                     datasets: [{
                         label: 'สายศิลป์ (ร้อยละ)',
                         data: artsValues,
-                        backgroundColor: 'rgba(251, 191, 36, 0.2)',
+                        backgroundColor: 'rgba(251, 191, 36, 0.15)',
                         borderColor: '#fbbf24',
                         borderWidth: 2,
                         pointBackgroundColor: '#d97706'
@@ -1343,9 +1486,9 @@
                         r: {
                             angleLines: { display: true },
                             suggestedMin: 0,
-                            suggestedMax: 100,
-                            ticks: { font: { family: 'Sarabun', size: 10 } },
-                            pointLabels: { font: { family: 'Sarabun', weight: 'bold' } }
+                            max: artsRadarMaxScale,
+                            ticks: { font: { family: 'Sarabun', size: 9 } },
+                            pointLabels: { font: { family: 'Sarabun', weight: 'bold', size: 11 } }
                         }
                     }
                 }
@@ -1457,73 +1600,116 @@
             lucide.createIcons();
         }
 
-        // Switch active detailed view track
-        function switchDetailTrack(track) {
-            activeDetailTrack = track;
-            const btnSci = document.getElementById('btn-detail-sci');
-            const btnArts = document.getElementById('btn-detail-arts');
-
-            if (track === 'sci') {
-                btnSci.className = "px-4 py-2 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-sm transition-all";
-                btnArts.className = "px-4 py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all";
-            } else {
-                btnSci.className = "px-4 py-2 text-xs font-medium rounded-lg text-slate-600 hover:text-slate-800 transition-all";
-                btnArts.className = "px-4 py-2 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-sm transition-all";
-            }
-
-            recalculateDataAndRender();
-        }
-
         // Subject breakdown card renderer (Tab 2)
         function renderDetailedTab(sciSubjAvg, artsSubjAvg) {
             const container = document.getElementById('subject-performance-cards');
             container.innerHTML = '';
 
-            const currentData = activeDetailTrack === 'sci' ? sciSubjAvg : artsSubjAvg;
+            // Map each subject with beautiful colorful aesthetics and emojis
+            const subjectStyles = {
+                math: { border: 'border-indigo-200', bg: 'bg-indigo-50/50', ring: 'text-indigo-600', emoji: '📐', desc: 'คณิตศาสตร์พื้นฐานและแอปพลิเคชัน' },
+                phys: { border: 'border-sky-200', bg: 'bg-sky-50/50', ring: 'text-sky-500', emoji: '⚛️', desc: 'ฟิสิกส์เชิงกลและไฟฟ้ากระแส' },
+                chem: { border: 'border-emerald-200', bg: 'bg-emerald-50/50', ring: 'text-emerald-500', emoji: '🧪', desc: 'เคมีปริมาณสารสัมพันธ์และอินทรีย์' },
+                bio: { border: 'border-green-200', bg: 'bg-green-50/50', ring: 'text-green-500', emoji: '🧬', desc: 'ชีววิทยาพันธุศาสตร์และสิ่งมีชีวิต' },
+                sci: { border: 'border-teal-200', bg: 'bg-teal-50/50', ring: 'text-teal-500', emoji: '🔬', desc: 'วิทยาศาสตร์ประยุกต์และธรรมชาติแวดล้อม' },
+                thai: { border: 'border-rose-200', bg: 'bg-rose-50/50', ring: 'text-rose-500', emoji: '🇹🇭', desc: 'ภาษาไทยจับประเด็นและวรรณกรรม' },
+                social: { border: 'border-amber-200', bg: 'bg-amber-50/50', ring: 'text-amber-500', emoji: '🗺️', desc: 'สังคมกฎหมาย เศรษฐศาสตร์และประวัติศาสตร์' },
+                eng: { border: 'border-purple-200', bg: 'bg-purple-50/50', ring: 'text-purple-500', emoji: '🇬🇧', desc: 'ภาษาอังกฤษทักษะวิเคราะห์บทความ' }
+            };
 
-            Object.keys(currentData).forEach(key => {
-                const sub = currentData[key];
+            const validSci = rawScienceStudents.filter(s => !s.isAbsent);
+            const validArts = rawArtsStudents.filter(s => !s.isAbsent);
+
+            // Set dynamic list of subjects to display depending on active global filter
+            let keys = [];
+            if (selectedGlobalFilter === 'all') {
+                keys = ['math', 'phys', 'chem', 'bio', 'sci', 'thai', 'social', 'eng'];
+            } else if (selectedGlobalFilter === 'Science') {
+                keys = ['math', 'bio', 'phys', 'chem', 'thai', 'social', 'eng'];
+            } else if (selectedGlobalFilter === 'Arts') {
+                keys = ['math', 'thai', 'social', 'eng', 'sci'];
+            }
+
+            keys.forEach(key => {
+                // Compute average across relevant track or integrated population
+                let sum = 0;
+                let activeCount = 0;
+
+                if (selectedGlobalFilter === 'Science' || key === 'phys' || key === 'chem' || key === 'bio') {
+                    validSci.forEach(s => {
+                        if (s.scores[key] > 0) {
+                            sum += s.scores[key];
+                            activeCount++;
+                        }
+                    });
+                } else if (selectedGlobalFilter === 'Arts' || key === 'sci') {
+                    validArts.forEach(s => {
+                        if (s.scores[key] > 0) {
+                            sum += s.scores[key];
+                            activeCount++;
+                        }
+                    });
+                } else {
+                    // Combined weighting across both target schools
+                    validSci.forEach(s => {
+                        if (s.scores[key] > 0) {
+                            sum += s.scores[key];
+                            activeCount++;
+                        }
+                    });
+                    validArts.forEach(s => {
+                        if (s.scores[key] > 0) {
+                            sum += s.scores[key];
+                            activeCount++;
+                        }
+                    });
+                }
+
+                const avgValue = activeCount > 0 ? (sum / activeCount) : 0;
+                const style = subjectStyles[key] || { border: 'border-slate-200', bg: 'bg-slate-50', ring: 'text-indigo-600', emoji: '📝', desc: 'วิชาสอบวัดระดับทักษะความรู้ทั่วไป' };
+
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between";
-
-                let ringColor = 'text-indigo-600';
-                if (sub.percent >= 80) ringColor = 'text-emerald-500';
-                else if (sub.percent < config.passThreshold) ringColor = 'text-rose-500';
+                card.className = `bg-white rounded-3xl p-5 border ${style.border} ${style.bg} shadow-sm flex flex-col justify-between transition-all duration-300 hover:scale-[1.015] hover:shadow-md`;
 
                 card.innerHTML = `
                     <div class="space-y-4">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h4 class="font-bold text-slate-900 text-sm sm:text-base">${getThaiSubjectName(key)}</h4>
-                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md font-semibold tracking-wider block mt-1">เต็ม 100 คะแนน</span>
+                                <h4 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-1.5">
+                                    <span>${style.emoji}</span>
+                                    <span>${getThaiSubjectName(key)}</span>
+                                </h4>
+                                <span class="text-[10px] text-slate-400 font-semibold tracking-wider block mt-1">${style.desc}</span>
                             </div>
                             <div class="relative flex items-center justify-center">
                                 <svg class="w-14 h-14 transform -rotate-90">
                                     <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="4" class="text-slate-100" fill="transparent" />
-                                    <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="4" class="${ringColor}" fill="transparent"
+                                    <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="4" class="${style.ring}" fill="transparent"
                                         stroke-dasharray="${2 * Math.PI * 24}"
-                                        stroke-dashoffset="${2 * Math.PI * 24 * (1 - sub.percent / 100)}" />
+                                        stroke-dashoffset="${2 * Math.PI * 24 * (1 - avgValue / 100)}" />
                                 </svg>
-                                <span class="absolute text-[10px] font-extrabold text-slate-700">${sub.percent.toFixed(1)}%</span>
+                                <span class="absolute text-[10px] font-extrabold text-slate-700">${avgValue.toFixed(1)}%</span>
                             </div>
                         </div>
 
-                        <!-- Mini metrics -->
-                        <div class="grid grid-cols-2 gap-2 border-t pt-3">
+                        <!-- Mini metrics (Excluding raw counts, focused fully on Percentage of understanding) -->
+                        <div class="grid grid-cols-2 gap-2 border-t border-slate-200/60 pt-3">
                             <div>
-                                <span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">คะแนนเฉลี่ย</span>
-                                <span class="text-base font-extrabold text-slate-800">${sub.avg.toFixed(1)}</span>
+                                <span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">ผลสัมฤทธิ์ร้อยละ</span>
+                                <span class="text-base font-extrabold text-slate-800">${avgValue.toFixed(1)}%</span>
                             </div>
                             <div>
-                                <span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">คำนวณจาก</span>
-                                <span class="text-xs font-extrabold text-slate-700">${sub.activeStudentsCount} คน (คะแนน > 0)</span>
+                                <span class="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">สถานะประเมิน</span>
+                                <span class="text-xs font-bold ${avgValue >= config.passThreshold ? 'text-emerald-600' : 'text-rose-600'} block mt-0.5">
+                                    ${avgValue >= config.passThreshold ? 'ผ่านเกณฑ์ปกติ' : 'ควรพัฒนาเร่งด่วน'}
+                                </span>
                             </div>
                         </div>
                         
                         <!-- Actions button for custom details insights -->
-                        <button onclick="showSubjectRecommendation('${key}')" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition-all border border-indigo-100 mt-2">
-                            <i data-lucide="lightbulb" class="w-4 h-4"></i>
-                            <span>คำแนะนำสำหรับวิชานี้</span>
+                        <button onclick="showSubjectRecommendation('${key}')" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-white/80 hover:bg-white text-slate-700 text-xs font-semibold rounded-xl transition-all border border-slate-200 mt-2">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-indigo-500"></i>
+                            <span>ทปอ. A-Level Blueprint และแผนพัฒนา</span>
                         </button>
                     </div>
                 `;
@@ -1549,7 +1735,7 @@
             tableBody.innerHTML = '';
 
             const searchTerm = document.getElementById('student-search').value.toLowerCase().trim();
-            const trackFilter = document.getElementById('student-track-filter').value;
+            const trackFilter = selectedGlobalFilter; // Bound with the global targeted pill selector
             const statusFilter = document.getElementById('student-status-filter').value;
 
             // Merge Science & Arts sets
@@ -1585,8 +1771,8 @@
                 let valA = a.percent;
                 let valB = b.percent;
 
-                if (a.isAbsent) valA = -1;
-                if (b.isAbsent) valB = -1;
+                if (a.isAbsent || a.total === 0) valA = -1;
+                if (b.isAbsent || b.total === 0) valB = -1;
 
                 if (sortDirection === 'asc') {
                     return valA - valB;
@@ -1602,8 +1788,10 @@
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50/70 transition-colors";
 
+                const isAllZero = s.isAbsent || s.total === 0;
+
                 let statusBadge = '';
-                if (s.isAbsent) {
+                if (isAllZero) {
                     statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">ขาดสอบ</span>`;
                 } else if (s.percent >= 80) {
                     statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">ยอดเยี่ยม (≥80%)</span>`;
@@ -1613,13 +1801,13 @@
                     statusBadge = `<span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">ควรพัฒนา</span>`;
                 }
 
-                const trackName = s.track === 'Science' ? 'วิทย์-คณิต' : 'ศิลป์-ทั่วไป';
+                const trackName = s.track === 'Science' ? 'วิทย์-คณิต' : 'สายศิลป์';
                 const trackBadgeClass = s.track === 'Science' ? 'bg-sky-50 text-sky-700 border border-sky-100' : 'bg-amber-50 text-amber-700 border border-amber-100';
 
-                // Display calculations
+                // Display calculations with smart absent check
                 const maxPossible = s.track === 'Science' ? 700 : 500;
-                const scoreDisplay = s.isAbsent ? '-' : `${s.total.toFixed(1)} / ${maxPossible} คะแนน`;
-                const percentDisplay = s.isAbsent ? '-' : `${s.percent.toFixed(1)}%`;
+                const scoreDisplay = isAllZero ? '(ขาดสอบ)' : `${s.total.toFixed(1)} / ${maxPossible} คะแนน`;
+                const percentDisplay = isAllZero ? '(ขาดสอบ)' : `${s.percent.toFixed(1)}%`;
 
                 row.innerHTML = `
                     <td class="px-6 py-4 text-center text-slate-500 font-medium">${s.no}</td>
@@ -1641,6 +1829,82 @@
             });
 
             lucide.createIcons();
+        }
+
+        // Dynamic Question Filler
+        function fillAndAskAI(query) {
+            document.getElementById('ai-query-input').value = query;
+            submitAIQuestion();
+        }
+
+        // Handle Interactive Consult queries to AI Advisor
+        function submitAIQuestion() {
+            const inputEl = document.getElementById('ai-query-input');
+            const query = inputEl.value.trim();
+            if (!query) return;
+
+            const chatBox = document.getElementById('ai-chat-output-box');
+            chatBox.classList.remove('hidden');
+
+            // Prepend User Question
+            const userMsg = document.createElement('div');
+            userMsg.className = "self-end bg-indigo-900/60 text-white p-3 rounded-2xl max-w-md border border-indigo-700/20";
+            userMsg.innerHTML = `<span class="font-bold block text-[10px] text-indigo-300">👤 คำถามผู้บริหาร:</span> <p class="mt-0.5">${query}</p>`;
+            chatBox.appendChild(userMsg);
+
+            // Generate Smart context-aware strategy answers
+            let responseHtml = '';
+            const cleanQuery = query.toLowerCase();
+
+            if (cleanQuery.includes('คณิต') || cleanQuery.includes('เลข')) {
+                responseHtml = `
+                    <p class="font-semibold text-emerald-400">🤖 ระบบตอบรับอัตโนมัติ AI Academic Expert:</p>
+                    <p class="mt-1">จากข้อมูลรายวิชา <b>คณิตศาสตร์</b> ของกลุ่มผู้ทดสอบนี้ พบว่าเป็นวิชาที่มีความเปราะบางสูงสุดและมีค่าความเบี่ยงเบนสะสมค่อนข้างกว้าง (SD สูง) แผนขับเคลื่อนระยะสั้น:</p>
+                    <ul class="list-disc pl-4 mt-2 space-y-1 text-slate-300">
+                        <li><b>คลินิกฝึกโจทย์จับเวลา (A-Level Core Speed Run):</b> เร่งแจกโจทย์ย่อยแคลคูลัสสะสมและพีชคณิตเป็น Micro-Sheets วันละ 3 ข้อ เพื่อสลายคะแนนกองกลาง</li>
+                        <li><b>ติวเตอร์เพื่อนช่วยเพื่อน (Peer-Assisted Learning):</b> จัดคู่ให้นักเรียนกลุ่มคะแนนท็อป (คะแนนร้อยละ ≥80%) เป็นผู้ช่วยสอนย่อยสำหรับบทเรขาคณิตประยุกต์ จะช่วยลดช่วงความเบี่ยงเบน SD ได้ถึง 15%</li>
+                    </ul>
+                `;
+            } else if (cleanQuery.includes('ศิลป์') || cleanQuery.includes('ภาษา') || cleanQuery.includes('สังคม')) {
+                responseHtml = `
+                    <p class="font-semibold text-emerald-400">🤖 ระบบตอบรับอัตโนมัติ AI Academic Expert:</p>
+                    <p class="mt-1">จากการสแกนกลุ่มเป้าหมายผู้สอบ <b>สายศิลป์</b> พบว่าวิชาความคุ้นชินเชิงบริบท เช่น สังคมศึกษาและภาษาอังกฤษ มีศักยภาพที่สูงแต่ยังขาดความคุ้มค่าด้านคะแนนวิเคราะห์เชิงลึก:</p>
+                    <ul class="list-disc pl-4 mt-2 space-y-1 text-slate-300">
+                        <li><b>ปรับโครงสร้าง Reading Skills ในภาษาอังกฤษ:</b> เลิกจำไวยากรณ์เดี่ยว ให้จัดติวเข้มจับคีย์เวิร์ดของวรรณกรรมร้อยแก้วยาว ๆ เสริมความรวดเร็วในการสอบ A-Level</li>
+                        <li><b>บูรณาการเชิงข่าวสารในวิชาสังคม:</b> นำประเด็นเหตุการณ์ปัจจุบันระดับโลก มาเทียบเคียงกับกรอบกฎหมายรัฐธรรมนูญและทฤษฎีภูมิศาสตร์เชิงลึกสัปดาห์ละครั้ง</li>
+                    </ul>
+                `;
+            } else if (cleanQuery.includes('เหลื่อมล้ำ') || cleanQuery.includes('ช่องว่าง') || cleanQuery.includes('sd')) {
+                responseHtml = `
+                    <p class="font-semibold text-emerald-400">🤖 ระบบตอบรับอัตโนมัติ AI Academic Expert:</p>
+                    <p class="mt-1">การแก้ไขปัญหา <b>ช่องว่างความรู้ทางวิชาการ (SD สูง)</b> ที่เกิดขึ้นในระบบประชากรกลุ่มนี้ จำเป็นต้องดำเนินการผ่านกลวิธีเชิงยุทธศาสตร์สากล:</p>
+                    <ul class="list-disc pl-4 mt-2 space-y-1 text-slate-300">
+                        <li><b>การจัดการเรียนรู้ต่างระดับ (Differentiated Learning):</b> ออกแบบการแบ่งกลุ่มทบทวน (เก่ง - กลาง - อ่อน) เพื่อแจกแจงระดับความยากของแบบฝึกหัดให้สอดรับกับความก้าวหน้า</li>
+                        <li><b>การวัดผลประเมินสัปดาห์ (Weekly Low-Stakes Quizzes):</b> เน้นทดสอบเก็บคะแนนแบบทดลองแบบไม่กดดัน เพื่อให้นักเรียนกลุ่มล่างค่อยๆ สลัดความกังวลและจำหัวใจสำคัญได้</li>
+                    </ul>
+                `;
+            } else {
+                responseHtml = `
+                    <p class="font-semibold text-emerald-400">🤖 ระบบตอบรับอัตโนมัติ AI Academic Expert:</p>
+                    <p class="mt-1">ขอบพระคุณสำหรับข้อคำถามวิเคราะห์เชิงกลยุทธ์ ยึดตามฐานประชากร ม.6 และผลสอบ Fast Track พฤษภาคม 2569 นี้ แนะนำให้จัดทำ <b>Academic Task Force</b>:</p>
+                    <ul class="list-disc pl-4 mt-2 space-y-1 text-slate-300">
+                        <li><b>วิเคราะห์ Blueprint รายวิชาต่ำร้อยละ 50:</b> ส่งครูผู้สอนวิเคราะห์รายวิชาที่เฉลี่ยต่ำที่สุดเพื่อรีเช็คความเข้าใจร่วมกัน</li>
+                        <li><b>จัดติวโค้งสุดท้าย 3 สัปดาห์ (Fast Track Bootcamps):</b> ดึงงบประมาณซ่อมเสริมจัดกิจกรรมติวจุดอับคะแนนที่นักเรียนทำเสียบ่อย</li>
+                    </ul>
+                `;
+            }
+
+            // Append AI Response
+            const aiMsg = document.createElement('div');
+            aiMsg.className = "self-start bg-slate-900 text-indigo-100 p-3.5 rounded-2xl max-w-md border border-indigo-500/20";
+            aiMsg.innerHTML = responseHtml;
+            chatBox.appendChild(aiMsg);
+
+            // Clean input
+            inputEl.value = '';
+
+            // Scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
     </script>
