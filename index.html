@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสรุปผลการสอบ Pre-Test ความเป็นเลิศ ม.6 | โรงเรียน ส.ว.</title>
+    <title>ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 | โรงเรียน ส.ว.</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -16,8 +16,9 @@
             }
         }
     </script>
-    <!-- Chart.js -->
+    <!-- Chart.js & DataLabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- SheetJS (XLSX Parser) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- PapaParse -->
@@ -31,17 +32,11 @@
         body { font-family: 'Sarabun', 'Inter', sans-serif; }
         .tab-btn.active { border-bottom: 2px solid #2563eb; color: #1e3a8a; font-weight: 600; }
         .filter-btn.active { background-color: #1e3a8a; color: white; border-color: #1e3a8a; }
-        /* Custom Scrollbar for tables/chats */
+        /* Custom Scrollbar for tables */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        .chat-container { display: flex; flex-direction: column; gap: 1rem; }
-        .chat-msg { max-width: 85%; padding: 0.75rem 1rem; border-radius: 1rem; font-size: 0.95rem; line-height: 1.5; }
-        .chat-user { align-self: flex-end; background-color: #3b82f6; color: white; border-bottom-right-radius: 0; }
-        .chat-ai { align-self: flex-start; background-color: #f1f5f9; color: #1e293b; border-bottom-left-radius: 0; border: 1px solid #e2e8f0; }
-        
         th.sortable:hover { background-color: #f8fafc; cursor: pointer; }
     </style>
 </head>
@@ -51,7 +46,7 @@
     <nav class="bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-10">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="bg-brand-600 p-2 rounded-lg text-white">
+                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-md">
                     <i data-lucide="bar-chart-2"></i>
                 </div>
                 <div>
@@ -60,10 +55,10 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <span id="data-status" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full flex items-center gap-1">
+                <span id="data-status" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm border border-yellow-200">
                     <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> กำลังโหลดข้อมูล
                 </span>
-                <button onclick="openSettings()" class="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-full transition-colors">
+                <button onclick="openSettings()" class="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-full transition-colors border border-transparent hover:border-brand-100">
                     <i data-lucide="settings"></i>
                 </button>
             </div>
@@ -71,79 +66,102 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-auto bg-slate-50 p-6">
+    <main class="flex-1 overflow-auto bg-slate-50 p-4 sm:p-6">
         <div class="max-w-7xl mx-auto space-y-6">
             
             <!-- Global Filter -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div class="text-sm font-semibold text-slate-500 flex items-center gap-2">
-                    <i data-lucide="filter" class="w-4 h-4"></i> มุมมองข้อมูล (Global Filter)
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div class="text-sm font-bold text-slate-600 flex items-center gap-2">
+                    <div class="bg-brand-100 p-1.5 rounded-lg text-brand-600"><i data-lucide="filter" class="w-4 h-4"></i></div>
+                    มุมมองข้อมูล (Global Filter)
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="setFilter('all')" id="btn-filter-all" class="filter-btn active px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50">🌐 ภาพรวมทั้งหมด</button>
-                    <button onclick="setFilter('science')" id="btn-filter-sci" class="filter-btn px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50">🔬 สายวิทย์-คณิต</button>
-                    <button onclick="setFilter('art')" id="btn-filter-art" class="filter-btn px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50">🎨 สายศิลป์</button>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button onclick="setFilter('all')" id="btn-filter-all" class="filter-btn active flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">🌐 ภาพรวม</button>
+                    <button onclick="setFilter('science')" id="btn-filter-sci" class="filter-btn flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">🔬 วิทย์-คณิต</button>
+                    <button onclick="setFilter('art')" id="btn-filter-art" class="filter-btn flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">🎨 สายศิลป์</button>
                 </div>
             </div>
 
-            <!-- Tabs -->
-            <div class="flex border-b border-slate-200 gap-6">
-                <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2">
+            <!-- Tabs Navigation -->
+            <div class="flex border-b border-slate-200 gap-6 px-2 overflow-x-auto">
+                <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
                     <i data-lucide="target" class="w-4 h-4"></i> ภาพรวมยุทธศาสตร์
                 </button>
-                <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2">
+                <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
                     <i data-lucide="pie-chart" class="w-4 h-4"></i> ผลสัมฤทธิ์รายวิชา
                 </button>
-                <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2">
+                <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
                     <i data-lucide="users" class="w-4 h-4"></i> บัญชีรายชื่อ
                 </button>
             </div>
 
             <!-- Tab 1: Strategy Overview -->
             <div id="tab1" class="space-y-6">
-                <!-- KPIs -->
+                <!-- KPIs Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="bg-emerald-100 p-3 rounded-full text-emerald-600"><i data-lucide="trending-up"></i></div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                        <div class="bg-emerald-100 p-3.5 rounded-xl text-emerald-600"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium">ผลสัมฤทธิ์รวม (Non-Zero Mean)</p>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">ผลสัมฤทธิ์รวม</p>
                             <h3 id="kpi-avg" class="text-2xl font-bold text-slate-800">--%</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="bg-blue-100 p-3 rounded-full text-blue-600"><i data-lucide="users"></i></div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                        <div class="bg-blue-100 p-3.5 rounded-xl text-blue-600"><i data-lucide="users" class="w-6 h-6"></i></div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium">จำนวนนักเรียนที่ประเมิน</p>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">จำนวนนักเรียนที่ประเมิน</p>
                             <h3 id="kpi-count" class="text-2xl font-bold text-slate-800">-- คน</h3>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-                        <div class="bg-rose-100 p-3 rounded-full text-rose-600"><i data-lucide="alert-triangle"></i></div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
+                        <div class="bg-rose-100 p-3.5 rounded-xl text-rose-600"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
                         <div>
-                            <p class="text-sm text-slate-500 font-medium">วิชาที่ควรปรับปรุงเร่งด่วน</p>
-                            <h3 id="kpi-weakest" class="text-xl font-bold text-slate-800">--</h3>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">วิชาที่ควรปรับปรุงเร่งด่วน</p>
+                            <h3 id="kpi-weakest" class="text-xl font-bold text-rose-600">--</h3>
                         </div>
                     </div>
                 </div>
 
+                <!-- Strategic Summary AI/Data Analysis Block -->
+                <div class="bg-gradient-to-br from-brand-900 to-indigo-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden border border-indigo-800">
+                    <div class="absolute right-0 top-0 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+                        <i data-lucide="cpu" class="w-64 h-64"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-5 h-5"></i> สรุปข้อวิเคราะห์และแผนยุทธศาสตร์ (Strategic Recommendations)
+                    </h3>
+                    <div id="dynamic-strategy-content" class="relative z-10">
+                        <!-- Dynamic Content Injected Here -->
+                        <div class="text-slate-300 text-sm flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังประมวลผลข้อมูลยุทธศาสตร์...</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
                 <div class="space-y-6">
                     <!-- Bar Chart (Full Width) -->
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-horizontal"></i> เปรียบเทียบผลสัมฤทธิ์ 4 วิชาแกนหลัก (%)</h3>
-                        <div class="h-64"><canvas id="coreBarChart"></canvas></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                            <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><i data-lucide="bar-chart-horizontal" class="text-brand-600"></i> เปรียบเทียบผลสัมฤทธิ์ 4 วิชาแกนหลัก (%)</h3>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium mt-2 sm:mt-0">Dynamic Scale & Labels</span>
+                        </div>
+                        <div class="h-72"><canvas id="coreBarChart"></canvas></div>
                     </div>
                     
                     <!-- Radar Charts Grid -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Radar Chart Sci -->
-                        <div id="radar-container-sci" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                            <h3 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="radar"></i> กราฟเปรียบเทียบผลสัมฤทธิ์รายวิชา (สายวิทย์-คณิต)</h3>
-                            <div class="h-64 relative flex justify-center"><canvas id="radarChartSci"></canvas></div>
+                        <div id="radar-container-sci" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><i data-lucide="radar" class="text-blue-500"></i> กราฟเปรียบเทียบผลสัมฤทธิ์ (สายวิทย์-คณิต)</h3>
+                            </div>
+                            <div class="h-72 relative flex justify-center"><canvas id="radarChartSci"></canvas></div>
                         </div>
                         <!-- Radar Chart Art -->
-                        <div id="radar-container-art" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                            <h3 class="text-md font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="radar"></i> กราฟเปรียบเทียบผลสัมฤทธิ์รายวิชา (สายศิลป์)</h3>
-                            <div class="h-64 relative flex justify-center"><canvas id="radarChartArt"></canvas></div>
+                        <div id="radar-container-art" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <div class="flex justify-between items-start mb-6">
+                                <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><i data-lucide="radar" class="text-amber-500"></i> กราฟเปรียบเทียบผลสัมฤทธิ์ (สายศิลป์)</h3>
+                            </div>
+                            <div class="h-72 relative flex justify-center"><canvas id="radarChartArt"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -151,25 +169,6 @@
 
             <!-- Tab 2: Subject Performance -->
             <div id="tab2" class="hidden space-y-6">
-                <!-- Exec Summary -->
-                <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 text-white shadow-md relative overflow-hidden">
-                    <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-                        <i data-lucide="lightbulb" class="w-64 h-64"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2">
-                        <i data-lucide="award"></i> ข้อเสนอแนะเชิงบริหาร (Executive Brief)
-                    </h3>
-                    <div class="space-y-2 text-sm text-slate-200 leading-relaxed max-w-4xl">
-                        <p>จากฐานข้อมูลการสอบ <b>Fast Track</b> พบว่า <span class="text-rose-300 font-medium">ผลสัมฤทธิ์โดยรวมหลายรายวิชายังอยู่ในเกณฑ์ที่ต้องเฝ้าระวัง (ต่ำกว่า 50%)</span> โดยเฉพาะกลุ่มวิชาคำนวณและวิทยาศาสตร์ประยุกต์ การปล่อยปละละเลยอาจส่งผลกระทบโดยตรงต่อสถิติการสอบติดมหาวิทยาลัยชั้นนำ (TCAS) ของโรงเรียน ส.ว.</p>
-                        <p><b>ข้อเสนอแนะเร่งด่วน:</b></p>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li><b>จัดทำ Individual Development Plan (IDP):</b> แยกนักเรียนเป็น 3 กลุ่ม (หัวกะทิ, ปานกลาง, วิกฤต) และจัดห้องเรียนเสริมพิเศษตามระดับความสามารถ (Differentiated Instruction)</li>
-                            <li><b>Targeted Bootcamps:</b> จัดแคมป์ติวเข้ม 1-2 วัน โดยเน้นเฉพาะ "จุดบอด (Weak Points)" ที่วิเคราะห์ได้จาก Blueprint ข้อสอบ A-Level ไม่ควรติวหว่านแห</li>
-                            <li><b>สร้างชุมชนแห่งการเรียนรู้ (PLC) สำหรับครู:</b> นำผลสอบนี้เข้าที่ประชุมกลุ่มสาระฯ เพื่อให้ครูผู้สอนปรับเปลี่ยนวิธีการประเมินผลระหว่างเรียน (Formative Assessment) ให้สอดคล้องกับแนวข้อสอบจริง</li>
-                        </ul>
-                    </div>
-                </div>
-
                 <div id="ring-charts-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     <!-- Ring charts injected here -->
                 </div>
@@ -177,26 +176,26 @@
 
             <!-- Tab 3: Student List -->
             <div id="tab3" class="hidden space-y-4">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                        <h3 class="font-bold text-slate-800">รายชื่อและผลประเมินรายบุคคล</h3>
-                        <div class="relative">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4 text-brand-600"></i> รายชื่อและผลประเมินรายบุคคล</h3>
+                        <div class="relative w-full sm:w-64">
                             <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4"></i>
-                            <input type="text" id="search-student" onkeyup="filterTable()" placeholder="ค้นหาชื่อ, รหัส..." class="border border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <input type="text" id="search-student" onkeyup="filterTable()" placeholder="ค้นหาชื่อ, รหัส..." class="w-full border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm">
                         </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-100 text-slate-600 font-medium">
+                            <thead class="bg-slate-100 text-slate-600 font-semibold text-xs uppercase tracking-wider">
                                 <tr>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('id')">รหัส <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('no')">เลขที่ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('name')">ชื่อ-สกุล <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('stream')">สายการเรียน <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('totalScore')">คะแนนรวม <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('percent')">ร้อยละ (%) <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 sortable" onclick="sortTable('status')">สถานะ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-4 py-3 text-right">การจัดการ</th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('id')">รหัส <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('no')">เลขที่ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('name')">ชื่อ-สกุล <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('stream')">สายการเรียน <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('totalScore')">คะแนนรวม <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('percent')">ร้อยละ (%) <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('status')">สถานะ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 text-right">การจัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="student-tbody" class="divide-y divide-slate-100">
@@ -211,99 +210,106 @@
     </main>
 
     <!-- Modals -->
+    
     <!-- Blueprint Modal -->
-    <div id="modal-blueprint" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+    <div id="modal-blueprint" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2" id="bp-title">💡 A-Level Blueprint</h3>
-                <button onclick="closeModal('modal-blueprint')" class="text-slate-400 hover:text-slate-700"><i data-lucide="x"></i></button>
+                <button onclick="closeModal('modal-blueprint')" class="text-slate-400 hover:text-slate-700 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="p-6 overflow-y-auto" id="bp-content">
+            <div class="p-6 overflow-y-auto custom-scrollbar" id="bp-content">
                 <!-- Content injected -->
             </div>
-            <div class="p-4 border-t border-slate-100 bg-slate-50 text-right">
-                <button onclick="closeModal('modal-blueprint')" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700">ปิดหน้าต่าง</button>
+            <div class="p-5 border-t border-slate-100 bg-slate-50 text-right">
+                <button onclick="closeModal('modal-blueprint')" class="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 shadow-sm transition-colors">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
 
     <!-- Student Detail Modal -->
-    <div id="modal-student" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-start bg-slate-50">
+    <div id="modal-student" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-gradient-to-r from-slate-50 to-white">
                 <div>
-                    <h3 class="font-bold text-xl text-slate-800" id="st-name">นาย ทดสอบ ระบบ</h3>
-                    <p class="text-sm text-slate-500 mt-1" id="st-meta">รหัส: 00000 | สายวิทย์-คณิต</p>
+                    <h3 class="font-bold text-2xl text-slate-800" id="st-name">นาย ทดสอบ ระบบ</h3>
+                    <p class="text-sm text-slate-500 font-medium mt-1.5 flex items-center gap-1.5" id="st-meta"><i data-lucide="user-square" class="w-4 h-4"></i> รหัส: 00000 | สายวิทย์-คณิต</p>
                 </div>
                 <div class="text-right">
-                    <button onclick="closeModal('modal-student')" class="text-slate-400 hover:text-slate-700 absolute top-4 right-4"><i data-lucide="x"></i></button>
-                    <div class="bg-white border border-slate-200 rounded-lg p-3 shadow-sm mt-6 mr-6 flex items-center gap-4">
+                    <button onclick="closeModal('modal-student')" class="text-slate-400 hover:text-slate-700 absolute top-4 right-4 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <!-- Enhanced Score Widget -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm mt-6 mr-4 flex items-center gap-4">
                         <div class="text-center">
-                            <p class="text-xs text-slate-500 font-medium">คะแนนรวม</p>
-                            <p class="text-lg font-bold text-brand-600" id="st-total">0/0</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">คะแนนรวม</p>
+                            <p class="text-xl font-black text-brand-600" id="st-total">0/0</p>
                         </div>
-                        <div class="w-px h-8 bg-slate-200"></div>
+                        <div class="w-px h-10 bg-slate-200"></div>
                         <div class="text-center">
-                            <p class="text-xs text-slate-500 font-medium">เฉลี่ย (%)</p>
-                            <p class="text-lg font-bold text-emerald-600" id="st-percent">0.00%</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">เปอร์เซ็นต์</p>
+                            <p class="text-xl font-black text-emerald-600" id="st-percent">0.00%</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="p-6">
-                <h4 class="text-sm font-semibold text-slate-600 mb-4 uppercase tracking-wider">คะแนนรายวิชา (จากเต็ม 100)</h4>
+                <h4 class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bar-chart" class="w-4 h-4"></i> สัดส่วนคะแนนรายวิชา (เต็ม 100)</h4>
                 <div class="h-64"><canvas id="studentBarChart"></canvas></div>
             </div>
         </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="modal-settings" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-bold text-lg text-slate-800">ตั้งค่าระบบ</h3>
-                <button onclick="closeModal('modal-settings')" class="text-slate-400 hover:text-slate-700"><i data-lucide="x"></i></button>
+    <div id="modal-settings" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-slate-500"></i> ตั้งค่าระบบ</h3>
+                <button onclick="closeModal('modal-settings')" class="text-slate-400 hover:text-slate-700 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">เกณฑ์ผ่าน (ร้อยละ)</label>
-                    <input type="number" id="pass-criteria" value="50" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-brand-500 focus:border-brand-500">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">เกณฑ์การผ่าน (ร้อยละ)</label>
+                    <div class="relative">
+                        <input type="number" id="pass-criteria" value="50" class="w-full border border-slate-300 rounded-xl pl-4 pr-10 py-2.5 text-sm font-semibold focus:ring-brand-500 focus:border-brand-500 shadow-sm">
+                        <span class="absolute right-4 top-2.5 text-slate-400 font-medium">%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">นักเรียนที่ได้คะแนนร้อยละเฉลี่ยต่ำกว่าเกณฑ์นี้ จะถูกจัดเป็นกลุ่ม "ควรปรับปรุง"</p>
                 </div>
             </div>
-            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
-                <button onclick="closeModal('modal-settings')" class="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg text-sm font-medium transition-colors">ยกเลิก</button>
-                <button onclick="saveSettings()" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors">บันทึก</button>
+            <div class="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                <button onclick="closeModal('modal-settings')" class="px-5 py-2.5 text-slate-600 hover:bg-slate-200 rounded-xl text-sm font-semibold transition-colors">ยกเลิก</button>
+                <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 shadow-sm transition-colors">บันทึกข้อมูล</button>
             </div>
         </div>
     </div>
 
     <script>
+        // Register ChartDataLabels plugin globally but disable it by default
+        Chart.register(ChartDataLabels);
+        Chart.defaults.plugins.datalabels = { display: false }; // We'll turn it on specifically for Radar & Bar charts
+
         // --- 1. CONFIG & STATE ---
-        const GEMINI_API_KEY = "AQ.Ab8RN6KiuA8RnLkd4oM4MZzBiQSpwg3ySBbhvAYF5EUY9uvmDQ"; // Hardcoded as requested
-        
-        // Subject definitions & Emojis
         const SUBJECTS = {
-            'math': { name: 'คณิตศาสตร์', keys: ['รวมคณิต', 'คณิต'], emoji: '📐', color: '#3b82f6' }, // blue
-            'thai': { name: 'ภาษาไทย', keys: ['ภาษาไทย', 'ไทย'], emoji: '🇹🇭', color: '#f59e0b' }, // amber
-            'social': { name: 'สังคมศึกษา', keys: ['สังคม', 'สังคมศึกษา'], emoji: '🌍', color: '#10b981' }, // emerald
-            'eng': { name: 'ภาษาอังกฤษ', keys: ['ภาษาอังกฤษ', 'อังกฤษ'], emoji: '🗣️', color: '#ec4899' }, // pink
-            'physics': { name: 'ฟิสิกส์', keys: ['รวมฟิสิกส์', 'ฟิสิกส์'], emoji: '⚛️', color: '#8b5cf6', stream: 'science' }, // violet
-            'chem': { name: 'เคมี', keys: ['เคมี'], emoji: '🧪', color: '#06b6d4', stream: 'science' }, // cyan
-            'bio': { name: 'ชีววิทยา', keys: ['รวมชีวะ', 'ชีวะ'], emoji: '🧬', color: '#84cc16', stream: 'science' }, // lime
-            'sci': { name: 'วิทยาศาสตร์', keys: ['วิทย์', 'วิทยาศาสตร์ทั่วไป'], emoji: '🔭', color: '#0ea5e9', stream: 'art' } // sky
+            'math': { name: 'คณิตศาสตร์', keys: ['รวมคณิต', 'คณิต'], emoji: '📐', color: '#3b82f6' },
+            'thai': { name: 'ภาษาไทย', keys: ['ภาษาไทย', 'ไทย'], emoji: '🇹🇭', color: '#f59e0b' },
+            'social': { name: 'สังคมศึกษา', keys: ['สังคม', 'สังคมศึกษา'], emoji: '🌍', color: '#10b981' },
+            'eng': { name: 'ภาษาอังกฤษ', keys: ['ภาษาอังกฤษ', 'อังกฤษ'], emoji: '🗣️', color: '#ec4899' },
+            'physics': { name: 'ฟิสิกส์', keys: ['รวมฟิสิกส์', 'ฟิสิกส์'], emoji: '⚛️', color: '#8b5cf6', stream: 'science' },
+            'chem': { name: 'เคมี', keys: ['เคมี'], emoji: '🧪', color: '#06b6d4', stream: 'science' },
+            'bio': { name: 'ชีววิทยา', keys: ['รวมชีวะ', 'ชีวะ'], emoji: '🧬', color: '#84cc16', stream: 'science' },
+            'sci': { name: 'วิทยาศาสตร์', keys: ['วิทย์', 'วิทยาศาสตร์ทั่วไป'], emoji: '🔭', color: '#0ea5e9', stream: 'art' }
         };
 
         let rawStudents = [];
         let state = {
             filter: 'all', // 'all', 'science', 'art'
             passCriteria: 50,
-            sortCol: 'id',
-            sortAsc: true
+            sortCol: 'percent',
+            sortAsc: false
         };
 
         let charts = {};
 
-        // Fallback Data (CSV Strings from prompt)
+        // Fallback Data
         const demoDataScience = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,,คณิต,รวมคณิต,ชีวะ,,รวมชีวะ,ฟิสิกส์,,รวมฟิสิกส์,ไทย,สังคม,เคมี,ภาษาอังกฤษ
 29141,1,นางสาววิภาดา,โก,15,0,15,12,7.47,19.47,15,,,40,18,15,53
 29168,2,นางสาวจรัสวดี,บัวตูม,12,0,12,17,8.54,25.54,6,,,42,32,23,35
@@ -326,29 +332,26 @@
             const statusEl = document.getElementById('data-status');
             
             try {
-                // Try reading file
                 const response = await fetch('สายวิทย์_2.xlsx');
                 if (!response.ok) throw new Error('File not found');
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
                 
                 rawStudents = [];
-                // Process all sheets
                 workbook.SheetNames.forEach(sheetName => {
                     const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
                     processRawJSON(json);
                 });
                 statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3 h-3"></i> โหลดข้อมูลจากไฟล์สำเร็จ';
-                statusEl.className = 'px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full flex items-center gap-1';
+                statusEl.className = 'px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm border border-emerald-200';
                 
             } catch (error) {
                 console.warn("File not found, using Fallback Demo Data", error);
-                // Fallback process
                 processRawJSON(Papa.parse(demoDataScience, { header: true }).data);
                 processRawJSON(Papa.parse(demoDataArt, { header: true }).data);
                 
                 statusEl.innerHTML = '<i data-lucide="info" class="w-3 h-3"></i> ใช้ข้อมูล Demo';
-                statusEl.className = 'px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex items-center gap-1';
+                statusEl.className = 'px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm border border-blue-200';
             }
             
             lucide.createIcons();
@@ -364,7 +367,6 @@
             const maxSubjects = isScience ? 7 : 5;
 
             data.forEach(row => {
-                // Clean keys
                 let cleanRow = {};
                 for(let k in row) cleanRow[k.trim()] = row[k];
                 
@@ -382,7 +384,6 @@
                     isMissing: false
                 };
 
-                // Remove "(ขาด)" from name
                 if(student.name.includes('(ขาด)')) {
                     student.name = student.name.replace('(ขาด)', '').trim();
                 }
@@ -390,15 +391,14 @@
                 let sum = 0;
                 let hasAnyScore = false;
 
-                // Extract scores dynamically based on logic (รวม first, then normal)
                 Object.entries(SUBJECTS).forEach(([subjKey, subjDef]) => {
-                    if (subjDef.stream && subjDef.stream !== streamStr) return; // Skip subjects not in stream
+                    if (subjDef.stream && subjDef.stream !== streamStr) return; 
 
                     let val = null;
                     for (let keyToFind of subjDef.keys) {
                         if (cleanRow[keyToFind] !== undefined && cleanRow[keyToFind] !== "") {
                             val = parseFloat(cleanRow[keyToFind]) || 0;
-                            break; // found the preferred key
+                            break; 
                         }
                     }
                     
@@ -407,7 +407,7 @@
                         sum += val;
                         if (val > 0) hasAnyScore = true;
                     } else {
-                         student.scores[subjKey] = 0; // Default to 0 if not found in this row but expected
+                         student.scores[subjKey] = 0; 
                     }
                 });
 
@@ -424,24 +424,29 @@
             state.filter = type;
             document.querySelectorAll('.filter-btn').forEach(b => {
                 b.classList.remove('active', 'bg-brand-600', 'text-white');
-                b.classList.add('text-slate-600');
+                b.classList.add('text-slate-600', 'bg-white');
             });
             
             let activeBtn = type === 'all' ? 'btn-filter-all' : type === 'science' ? 'btn-filter-sci' : 'btn-filter-art';
             let btn = document.getElementById(activeBtn);
             btn.classList.add('active', 'bg-brand-600', 'text-white');
-            btn.classList.remove('text-slate-600');
+            btn.classList.remove('text-slate-600', 'bg-white');
 
             applyFilterAndRender();
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-brand-600', 'text-brand-900'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active', 'border-brand-600', 'text-brand-900');
+                b.classList.add('border-transparent');
+            });
             document.querySelectorAll('[id^="tab"]').forEach(t => t.classList.add('hidden'));
             
             document.getElementById(tabId).classList.remove('hidden');
             let btnId = 'btn-' + tabId;
-            document.getElementById(btnId).classList.add('active', 'border-brand-600', 'text-brand-900');
+            let btn = document.getElementById(btnId);
+            btn.classList.add('active', 'border-brand-600', 'text-brand-900');
+            btn.classList.remove('border-transparent');
         }
 
         function getFilteredStudents() {
@@ -459,7 +464,7 @@
             });
             if (validScores.length === 0) return 0;
             let sum = validScores.reduce((a, b) => a + b, 0);
-            return sum / validScores.length; // Max is 100, so this is equivalent to %
+            return sum / validScores.length; 
         }
 
         function applyFilterAndRender() {
@@ -475,13 +480,11 @@
             }
             document.getElementById('kpi-avg').innerText = totalAvgPercent.toFixed(2) + '%';
 
-            // Find weakest subject
             let minAvg = 100;
             let weakSubj = '-';
             Object.keys(SUBJECTS).forEach(key => {
                 if (state.filter !== 'all' && SUBJECTS[key].stream && SUBJECTS[key].stream !== state.filter) return;
                 let avg = calculateNonZeroMean(students, key);
-                // only consider if there are actual scores
                 if (avg > 0 && avg < minAvg) {
                     minAvg = avg;
                     weakSubj = SUBJECTS[key].name;
@@ -489,13 +492,64 @@
             });
             document.getElementById('kpi-weakest').innerText = minAvg < 100 ? `${weakSubj} (${minAvg.toFixed(1)}%)` : '-';
 
-            // 2. Render Charts
+            // 2. Render Strategic Summary
+            renderExecutiveBriefTab1(students);
+
+            // 3. Render Charts
             renderCoreBarChart();
             renderRadarCharts();
             renderSubjectRings();
 
-            // 3. Render Table
+            // 4. Render Table
             renderTable();
+        }
+
+        // Generate Dynamic Strategic Summary (Tab 1)
+        function renderExecutiveBriefTab1(students) {
+            const container = document.getElementById('dynamic-strategy-content');
+            if (students.length === 0) {
+                container.innerHTML = '<p class="text-slate-300">ไม่มีข้อมูลเพียงพอสำหรับการวิเคราะห์</p>';
+                return;
+            }
+
+            let subjAverages = [];
+            Object.keys(SUBJECTS).forEach(key => {
+                if (state.filter !== 'all' && SUBJECTS[key].stream && SUBJECTS[key].stream !== state.filter) return;
+                let avg = calculateNonZeroMean(students, key);
+                if (avg > 0) subjAverages.push({ key: key, name: SUBJECTS[key].name, avg: avg });
+            });
+
+            if (subjAverages.length < 2) {
+                container.innerHTML = '<p class="text-slate-300">ไม่มีข้อมูลผลสอบเพียงพอในมุมมองนี้</p>';
+                return;
+            }
+
+            subjAverages.sort((a, b) => b.avg - a.avg);
+            let topSubj = subjAverages[0];
+            let weakSubj = subjAverages[subjAverages.length - 1];
+
+            let html = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
+                        <p class="font-bold text-emerald-300 flex items-center gap-2 mb-2 text-sm uppercase tracking-wider"><i data-lucide="trending-up" class="w-4 h-4"></i> จุดแข็ง (Strengths)</p>
+                        <p class="text-sm leading-relaxed text-slate-200">ผลสัมฤทธิ์โดดเด่นในวิชา <b>${topSubj.name} (${topSubj.avg.toFixed(1)}%)</b> แสดงถึงศักยภาพพื้นฐานที่ดีเยี่ยม ควรต่อยอดด้วยโจทย์ประยุกต์ระดับสูง (Advanced Application) ในคาบเรียนเพื่อผลักดันคะแนนสู่ระดับ Top ของประเทศ</p>
+                    </div>
+                    <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
+                        <p class="font-bold text-rose-300 flex items-center gap-2 mb-2 text-sm uppercase tracking-wider"><i data-lucide="trending-down" class="w-4 h-4"></i> จุดวิกฤต (Critical Areas)</p>
+                        <p class="text-sm leading-relaxed text-slate-200">วิชา <b>${weakSubj.name} (${weakSubj.avg.toFixed(1)}%)</b> เป็นปัจจัยเสี่ยงหลักที่ฉุดรั้งค่าเฉลี่ยรวม จำเป็นต้องปรับยุทธศาสตร์การสอนด่วน โดยเน้นปูพื้นฐานแนวคิดหลัก (Core Concepts) ใหม่ และลดทอนความซับซ้อนของโจทย์ในช่วงแรก</p>
+                    </div>
+                </div>
+                <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm mt-4">
+                     <p class="font-bold text-amber-300 flex items-center gap-2 mb-3 text-sm uppercase tracking-wider"><i data-lucide="target" class="w-4 h-4"></i> แผนปฏิบัติการระยะสั้น (Actionable Plan)</p>
+                     <ul class="list-disc pl-5 space-y-2 text-sm text-slate-200">
+                        <li><b>Targeted Bootcamps:</b> จัดกิจกรรมติวเข้ม 1-2 วัน โดยโฟกัสเฉพาะเนื้อหาที่ออกสอบบ่อย (High Yield) ของวิชา <b>${weakSubj.name}</b> ตามโครงสร้าง A-Level</li>
+                        <li><b>Differentiated Instruction:</b> แบ่งกลุ่มนักเรียนตามผลประเมิน เพื่อจัดการสอนซ่อมเสริมวิชา <b>${weakSubj.name}</b> ให้กลุ่มวิกฤต และมอบหมายโจทย์ท้าทายวิชา <b>${topSubj.name}</b> ให้กลุ่มหัวกะทิ</li>
+                        <li><b>Mock Exams:</b> ใช้ชุดข้อสอบเก่าจริงย้อนหลัง 3 ปี จับเวลาสอบในสภาพแวดล้อมเสมือนจริงเพื่อสร้างความคุ้นชิน</li>
+                     </ul>
+                </div>
+            `;
+            container.innerHTML = html;
+            lucide.createIcons();
         }
 
         // --- 4. CHARTS (Chart.js) ---
@@ -511,23 +565,30 @@
             const artAverages = coreSubjects.map(key => calculateNonZeroMean(artStudents, key));
 
             let datasets = [];
+            let allPlottedValues = [];
             
             if (state.filter === 'all' || state.filter === 'science') {
                 datasets.push({
                     label: 'สายวิทย์-คณิต',
                     data: sciAverages,
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)', // blue
-                    borderRadius: 4
+                    backgroundColor: 'rgba(59, 130, 246, 0.9)', 
+                    borderRadius: 6
                 });
+                allPlottedValues.push(...sciAverages);
             }
             if (state.filter === 'all' || state.filter === 'art') {
                 datasets.push({
                     label: 'สายศิลป์',
                     data: artAverages,
-                    backgroundColor: 'rgba(245, 158, 11, 0.8)', // amber
-                    borderRadius: 4
+                    backgroundColor: 'rgba(245, 158, 11, 0.9)', 
+                    borderRadius: 6
                 });
+                allPlottedValues.push(...artAverages);
             }
+
+            // Dynamic Scale Logic (add 15% headroom for labels)
+            let maxDataVal = Math.max(...allPlottedValues.filter(v => !isNaN(v)));
+            let dynamicMaxScale = maxDataVal > 0 ? Math.min(100, Math.ceil(maxDataVal * 1.15)) : 100;
 
             charts.bar = new Chart(ctx, {
                 type: 'bar',
@@ -538,9 +599,25 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top' } },
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } },
+                        datalabels: { // Enable % on top of bars
+                            display: true,
+                            align: 'end',
+                            anchor: 'end',
+                            color: '#475569',
+                            font: { family: 'Inter', weight: 'bold', size: 11 },
+                            formatter: function(value) { return value > 0 ? value.toFixed(1) + '%' : ''; }
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: true, max: 100, title: { display: true, text: 'ร้อยละ (%)' } }
+                        y: { 
+                            beginAtZero: true, 
+                            max: dynamicMaxScale, // Apply Dynamic Scale
+                            grid: { borderDash: [4, 4] },
+                            ticks: { callback: function(val){ return val + '%'; } }
+                        },
+                        x: { grid: { display: false } }
                     }
                 }
             });
@@ -551,6 +628,19 @@
             document.getElementById('radar-container-sci').style.display = (state.filter === 'all' || state.filter === 'science') ? 'block' : 'none';
             document.getElementById('radar-container-art').style.display = (state.filter === 'all' || state.filter === 'art') ? 'block' : 'none';
 
+            // Common datalabel config for Radars
+            const radarDatalabelsConfig = {
+                display: true,
+                color: '#0f172a',
+                backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                borderRadius: 4,
+                borderWidth: 1,
+                borderColor: 'rgba(0,0,0,0.1)',
+                font: { family: 'Inter', weight: 'bold', size: 10 },
+                padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                formatter: function(value) { return value > 0 ? value.toFixed(1) + '%' : ''; }
+            };
+
             // --- Sci Radar ---
             const ctxSci = document.getElementById('radarChartSci').getContext('2d');
             if (charts.radarSci) charts.radarSci.destroy();
@@ -560,9 +650,9 @@
             let sciLabels = sciKeys.map(k => SUBJECTS[k].name);
             let sciData = sciKeys.map(k => calculateNonZeroMean(sciStudents, k));
             
-            // Dynamic scale: Max value touches the edge
-            let sciMaxVal = Math.max(...sciData);
-            if (sciMaxVal <= 0) sciMaxVal = 100; // Fallback if no data
+            // Dynamic close-scale (touches the edge + slightly more padding for labels)
+            let sciMaxVal = Math.max(...sciData.filter(v => !isNaN(v)));
+            let sciMaxScale = sciMaxVal > 0 ? Math.min(100, Math.ceil(sciMaxVal + 10)) : 100;
 
             charts.radarSci = new Chart(ctxSci, {
                 type: 'radar',
@@ -571,16 +661,28 @@
                     datasets: [{
                         label: 'สายวิทย์-คณิต',
                         data: sciData,
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.25)',
                         borderColor: 'rgba(59, 130, 246, 1)',
                         pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2
+                        borderWidth: 2,
+                        pointRadius: 4
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { r: { angleLines: { display: true }, suggestedMin: 0, max: sciMaxVal, ticks: { display: false } } },
-                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.raw.toFixed(1) + '%'; } } } }
+                    scales: { 
+                        r: { 
+                            angleLines: { display: true }, 
+                            suggestedMin: 0, 
+                            max: sciMaxScale, 
+                            ticks: { display: false } 
+                        } 
+                    },
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { callbacks: { label: function(context) { return context.raw.toFixed(1) + '%'; } } },
+                        datalabels: radarDatalabelsConfig
+                    }
                 }
             });
 
@@ -593,9 +695,9 @@
             let artLabels = artKeys.map(k => SUBJECTS[k].name);
             let artData = artKeys.map(k => calculateNonZeroMean(artStudents, k));
             
-            // Dynamic scale: Max value touches the edge
-            let artMaxVal = Math.max(...artData);
-            if (artMaxVal <= 0) artMaxVal = 100;
+            // Dynamic close-scale (touches the edge + slightly more padding for labels)
+            let artMaxVal = Math.max(...artData.filter(v => !isNaN(v)));
+            let artMaxScale = artMaxVal > 0 ? Math.min(100, Math.ceil(artMaxVal + 10)) : 100;
 
             charts.radarArt = new Chart(ctxArt, {
                 type: 'radar',
@@ -604,16 +706,28 @@
                     datasets: [{
                         label: 'สายศิลป์',
                         data: artData,
-                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        backgroundColor: 'rgba(245, 158, 11, 0.25)',
                         borderColor: 'rgba(245, 158, 11, 1)',
                         pointBackgroundColor: 'rgba(245, 158, 11, 1)',
-                        borderWidth: 2
+                        borderWidth: 2,
+                        pointRadius: 4
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { r: { angleLines: { display: true }, suggestedMin: 0, max: artMaxVal, ticks: { display: false } } },
-                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.raw.toFixed(1) + '%'; } } } }
+                    scales: { 
+                        r: { 
+                            angleLines: { display: true }, 
+                            suggestedMin: 0, 
+                            max: artMaxScale, 
+                            ticks: { display: false } 
+                        } 
+                    },
+                    plugins: { 
+                        legend: { display: false }, 
+                        tooltip: { callbacks: { label: function(context) { return context.raw.toFixed(1) + '%'; } } },
+                        datalabels: radarDatalabelsConfig
+                    }
                 }
             });
         }
@@ -628,28 +742,29 @@
                 if (state.filter !== 'all' && subj.stream && subj.stream !== state.filter) return;
 
                 const avg = calculateNonZeroMean(students, key);
-                if (avg === 0 && students.length > 0) return; // Skip if absolutely no data
+                if (avg === 0 && students.length > 0) return;
 
                 const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col items-center relative hover:shadow-md transition-shadow";
+                card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center relative hover:shadow-md transition-all group";
                 
                 const canvasId = `ring-${key}`;
                 card.innerHTML = `
-                    <div class="absolute top-3 left-3 text-2xl">${subj.emoji}</div>
-                    <div class="h-28 w-28 relative mt-4 mb-2">
+                    <div class="absolute top-4 left-4 text-2xl group-hover:scale-110 transition-transform">${subj.emoji}</div>
+                    <div class="h-28 w-28 relative mt-5 mb-3">
                         <canvas id="${canvasId}"></canvas>
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <span class="text-base font-bold text-slate-700">${avg.toFixed(1)}%</span>
+                        <!-- Center Label % inside ring -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <span class="text-xl font-black text-slate-800 tracking-tight leading-none">${avg.toFixed(1)}</span>
+                            <span class="text-[10px] font-bold text-slate-400 leading-none mt-1">%</span>
                         </div>
                     </div>
-                    <h4 class="mt-2 font-semibold text-slate-800 text-sm mb-3">${subj.name}</h4>
-                    <button onclick="openBlueprint('${key}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md w-full flex items-center justify-center gap-1 transition-colors">
-                        <i data-lucide="book-open" class="w-3 h-3"></i> Blueprint
+                    <h4 class="font-bold text-slate-800 text-sm mb-3">${subj.name}</h4>
+                    <button onclick="openBlueprint('${key}')" class="text-xs bg-slate-50 hover:bg-brand-50 hover:text-brand-700 text-slate-600 font-medium px-4 py-2 rounded-xl w-full flex items-center justify-center gap-1.5 transition-colors border border-slate-200">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> A-Level Blueprints
                     </button>
                 `;
                 container.appendChild(card);
 
-                // Draw Doughnut
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 new Chart(ctx, {
                     type: 'doughnut',
@@ -659,14 +774,19 @@
                             backgroundColor: [subj.color, '#f1f5f9'],
                             borderWidth: 0,
                             circumference: 360,
-                            rotation: 270
+                            rotation: 270,
+                            borderRadius: 4
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        cutout: '75%',
-                        plugins: { tooltip: { enabled: false }, legend: { display: false } }
+                        cutout: '78%',
+                        plugins: { 
+                            tooltip: { enabled: false }, 
+                            legend: { display: false },
+                            datalabels: { display: false } // Hide datalabels for rings, we use HTML center
+                        }
                     }
                 });
             });
@@ -676,7 +796,7 @@
         // --- 5. TABLE & MODALS ---
         function sortTable(col) {
             if (state.sortCol === col) {
-                state.sortAsc = !state.sortAsc; // Toggle direction
+                state.sortAsc = !state.sortAsc; 
             } else {
                 state.sortCol = col;
                 state.sortAsc = true;
@@ -695,13 +815,12 @@
                 students = students.filter(s => s.name.toLowerCase().includes(search) || s.id.toString().includes(search));
             }
 
-            // Sorting logic
             students.sort((a, b) => {
                 let valA = a[state.sortCol];
                 let valB = b[state.sortCol];
                 
+                // Special handling for status sorting
                 if (state.sortCol === 'status') {
-                    // Custom order for status: 0 (Missing) -> 1 (Needs Improvement) -> 2 (Pass)
                     const getStatusVal = (s) => s.isMissing ? 0 : (s.percent >= state.passCriteria ? 2 : 1);
                     valA = getStatusVal(a);
                     valB = getStatusVal(b);
@@ -717,33 +836,38 @@
 
             students.forEach(s => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0 transition-colors";
+                tr.className = "hover:bg-brand-50/50 border-b border-slate-100 last:border-0 transition-colors";
                 
                 let statusBadge = '';
                 if (s.isMissing) {
-                    statusBadge = '<span class="px-2 py-1 bg-slate-100 text-slate-500 text-xs rounded-md font-medium">(ขาดสอบ)</span>';
+                    statusBadge = '<span class="px-2.5 py-1 bg-slate-100 text-slate-500 border border-slate-200 text-xs rounded-lg font-medium">(ขาดสอบ)</span>';
                 } else if (s.percent >= state.passCriteria) {
-                    statusBadge = '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-md font-medium">ผ่านเกณฑ์</span>';
+                    statusBadge = '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs rounded-lg font-bold">ผ่านเกณฑ์</span>';
                 } else {
-                    statusBadge = '<span class="px-2 py-1 bg-rose-100 text-rose-700 text-xs rounded-md font-medium">ควรปรับปรุง</span>';
+                    statusBadge = '<span class="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 text-xs rounded-lg font-bold">ควรปรับปรุง</span>';
                 }
 
+                const streamBadge = s.stream === 'science' 
+                    ? '<span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">วิทย์-คณิต</span>'
+                    : '<span class="px-2 py-1 bg-amber-50 text-amber-700 rounded-md text-xs font-medium">สายศิลป์</span>';
+
                 tr.innerHTML = `
-                    <td class="px-4 py-3 text-slate-600">${s.id}</td>
-                    <td class="px-4 py-3 text-slate-500">${s.no}</td>
-                    <td class="px-4 py-3 font-medium text-slate-800">${s.name}</td>
-                    <td class="px-4 py-3 text-slate-500">${s.streamName}</td>
-                    <td class="px-4 py-3 font-semibold ${s.isMissing ? 'text-slate-400' : 'text-brand-600'}">${s.isMissing ? '-' : s.totalScore.toFixed(1) + ' / ' + s.maxScore}</td>
-                    <td class="px-4 py-3 font-semibold ${s.isMissing ? 'text-slate-400' : 'text-slate-700'}">${s.isMissing ? '-' : s.percent.toFixed(2) + '%'}</td>
-                    <td class="px-4 py-3">${statusBadge}</td>
-                    <td class="px-4 py-3 text-right">
-                        <button onclick="viewStudent('${s.id}')" class="text-xs bg-white border border-slate-300 hover:border-brand-500 hover:text-brand-600 px-3 py-1.5 rounded shadow-sm transition-colors">
-                            ดูข้อมูล
+                    <td class="px-5 py-3.5 text-slate-600 font-medium">${s.id}</td>
+                    <td class="px-5 py-3.5 text-slate-500">${s.no}</td>
+                    <td class="px-5 py-3.5 font-bold text-slate-800">${s.name}</td>
+                    <td class="px-5 py-3.5">${streamBadge}</td>
+                    <td class="px-5 py-3.5 font-bold ${s.isMissing ? 'text-slate-400' : 'text-slate-800'}">${s.isMissing ? '-' : s.totalScore.toFixed(2) + ' <span class="text-xs text-slate-400 font-normal">/ ' + s.maxScore + '</span>'}</td>
+                    <td class="px-5 py-3.5 font-black ${s.isMissing ? 'text-slate-400' : 'text-brand-600'}">${s.isMissing ? '-' : s.percent.toFixed(2) + '%'}</td>
+                    <td class="px-5 py-3.5">${statusBadge}</td>
+                    <td class="px-5 py-3.5 text-right">
+                        <button onclick="viewStudent('${s.id}')" class="text-xs bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 text-slate-600 font-medium px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5 ml-auto">
+                            <i data-lucide="line-chart" class="w-3.5 h-3.5"></i> ดูข้อมูล
                         </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
+            lucide.createIcons();
         }
 
         function filterTable() {
@@ -755,9 +879,9 @@
             if (!student) return;
 
             document.getElementById('st-name').innerText = student.name;
-            document.getElementById('st-meta').innerText = `รหัส: ${student.id} | เลขที่: ${student.no} | ${student.streamName}`;
+            document.getElementById('st-meta').innerHTML = `<i data-lucide="user-square" class="w-4 h-4"></i> รหัส: ${student.id} | เลขที่: ${student.no} | ${student.streamName}`;
             
-            document.getElementById('st-total').innerText = student.isMissing ? '-' : `${student.totalScore.toFixed(1)} / ${student.maxScore}`;
+            document.getElementById('st-total').innerText = student.isMissing ? '-' : `${student.totalScore.toFixed(2)} / ${student.maxScore}`;
             document.getElementById('st-percent').innerText = student.isMissing ? '-' : `${student.percent.toFixed(2)}%`;
 
             const ctx = document.getElementById('studentBarChart').getContext('2d');
@@ -782,22 +906,34 @@
                         label: 'คะแนนที่ได้',
                         data: data,
                         backgroundColor: colors,
-                        borderRadius: 4
+                        borderRadius: 6
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Horizontal bar
+                    indexAxis: 'y', 
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            display: true,
+                            align: 'end',
+                            anchor: 'end',
+                            color: '#1e293b',
+                            font: { family: 'Inter', weight: 'bold', size: 11 },
+                            formatter: function(value) { return value > 0 ? value.toFixed(1) : ''; }
+                        }
+                    },
                     scales: {
-                        x: { beginAtZero: true, max: 100 }
+                        x: { beginAtZero: true, max: 100, grid: { borderDash: [4, 4] } },
+                        y: { grid: { display: false } }
                     }
                 }
             });
 
             document.getElementById('modal-student').classList.remove('hidden');
             document.getElementById('modal-student').classList.add('flex');
+            lucide.createIcons();
         }
 
         // TCAS Blueprint Content Database (Historical 5-Years)
@@ -825,13 +961,13 @@
                  planLevel = '<span class="text-slate-500 font-bold">ไม่มีข้อมูลคะแนน (No Data)</span>';
                  planDesc = 'ยังไม่มีสถิติคะแนนเพียงพอในการประเมินยุทธศาสตร์สำหรับวิชานี้';
             } else if (currentAvg < 40) {
-                planLevel = '<span class="text-rose-600 font-bold">ระดับวิกฤต (เฉลี่ยต่ำกว่า 40%)</span>';
+                planLevel = '<span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">ระดับวิกฤต (เฉลี่ยต่ำกว่า 40%)</span>';
                 planDesc = 'นักเรียนส่วนใหญ่ยังขาดความเข้าใจในแก่นของวิชานี้ (Core Concepts) <br><br><b>แผนพัฒนาที่เหมาะสม:</b> ควรงดการตะลุยโจทย์ระดับประยุกต์หรือโจทย์แข่งขันชั่วคราว และกลับมาปูพื้นฐานใหม่โดยด่วน จัดทำสื่อสรุปเนื้อหาหลัก (Mind Mapping) และใช้โจทย์ระดับพื้นฐานเพื่อสร้างความมั่นใจและฐานที่แน่นหนาก่อน';
             } else if (currentAvg < 60) {
-                planLevel = '<span class="text-amber-600 font-bold">ระดับปานกลาง/เฝ้าระวัง (เฉลี่ย 40% - 60%)</span>';
+                planLevel = '<span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">ระดับปานกลาง/เฝ้าระวัง (เฉลี่ย 40% - 60%)</span>';
                 planDesc = 'นักเรียนมีความรู้พื้นฐานดีระดับหนึ่ง แต่มักจะทำข้อสอบประยุกต์พลาด หรือบริหารเวลาทำข้อสอบไม่ทัน <br><br><b>แผนพัฒนาที่เหมาะสม:</b> เน้นการวิเคราะห์ข้อสอบย้อนหลัง (Past Papers) จับเวลาทำจริงแบบ Mock Test และให้ครูผู้สอนจัดทำ "Error Log" ให้นักเรียนจดบันทึกข้อที่ตัวเองทำผิดซ้ำซาก เพื่ออุดรอยรั่วให้ตรงจุด';
             } else {
-                planLevel = '<span class="text-emerald-600 font-bold">ระดับดี/ต่อยอด (เฉลี่ยสูงกว่า 60%)</span>';
+                planLevel = '<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">ระดับดี/ต่อยอด (เฉลี่ยสูงกว่า 60%)</span>';
                 planDesc = 'ภาพรวมนักเรียนมีศักยภาพสูงและทำความเข้าใจในวิชานี้ได้ดีมาก <br><br><b>แผนพัฒนาที่เหมาะสม:</b> ใช้ชุดข้อสอบจำลองที่มีความยากเทียบเท่าหรือสูงกว่าข้อสอบ A-Level เล็กน้อย และเน้นสอน "เทคนิคการตัดช้อยส์และจุดหลอก" เพื่อเร่งความเร็วในการทำโจทย์ หวังผลคะแนนระดับ Top 10% ของประเทศ';
             }
 
@@ -839,31 +975,35 @@
             const topicsHtml = blueprintData.topics.map(t => `<li>${t}</li>`).join('');
 
             let content = `
-                <div class="space-y-5 text-sm text-slate-700">
+                <div class="space-y-6 text-sm text-slate-700">
                     <!-- Dynamic Data Plan -->
-                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
-                        <h4 class="font-bold text-indigo-900 mb-2 flex items-center gap-2"><i data-lucide="line-chart" class="w-4 h-4"></i> สถานการณ์และแผนพัฒนา (อ้างอิงจากข้อมูลจริงของนักเรียน)</h4>
-                        <p class="mb-1">สถานะภาพรวม: ${planLevel} (เฉลี่ย ${currentAvg.toFixed(1)}%)</p>
-                        <p class="text-indigo-800 bg-white p-3 rounded-lg border border-indigo-100 mt-2 leading-relaxed">${planDesc}</p>
+                    <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 shadow-sm">
+                        <h4 class="font-bold text-indigo-900 mb-3 flex items-center gap-2"><i data-lucide="line-chart" class="w-5 h-5 text-indigo-600"></i> สถานการณ์และแผนพัฒนา (อ้างอิงจากคะแนนสอบจริง)</h4>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="font-medium text-slate-600">สถานะภาพรวม:</span> 
+                            ${planLevel} 
+                            <span class="font-black text-indigo-600 ml-auto text-lg">${currentAvg.toFixed(1)}%</span>
+                        </div>
+                        <p class="text-slate-700 bg-white p-4 rounded-xl border border-indigo-100 leading-relaxed shadow-sm">${planDesc}</p>
                     </div>
 
                     <!-- TCAS Historical Data -->
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i> สถิติหัวข้อที่ออกสอบบ่อย (ย้อนหลัง 5 ปีในระบบ TCAS)</h4>
-                        <ul class="list-disc pl-5 space-y-1.5 text-slate-600">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5 text-slate-500"></i> สถิติหัวข้อที่ออกสอบบ่อย (ย้อนหลัง 5 ปี TCAS)</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-slate-600 marker:text-brand-400 font-medium">
                             ${topicsHtml}
                         </ul>
                     </div>
 
                     <!-- Test Focus -->
                     <div>
-                        <h4 class="font-bold text-slate-800 mb-1 flex items-center gap-2"><i data-lucide="target" class="w-4 h-4"></i> ลักษณะข้อสอบ (Test Focus)</h4>
-                        <p class="bg-slate-100 px-4 py-3 rounded-lg text-slate-600 leading-relaxed">${blueprintData.focus}</p>
+                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-rose-500"></i> ลักษณะข้อสอบ (Test Focus)</h4>
+                        <p class="bg-slate-50 border border-slate-100 px-5 py-4 rounded-xl text-slate-600 leading-relaxed font-medium shadow-sm">${blueprintData.focus}</p>
                     </div>
                 </div>
             `;
             document.getElementById('bp-content').innerHTML = content;
-            lucide.createIcons(); // Refresh icons inside modal
+            lucide.createIcons(); 
             
             document.getElementById('modal-blueprint').classList.remove('hidden');
             document.getElementById('modal-blueprint').classList.add('flex');
@@ -886,7 +1026,7 @@
             document.getElementById(id).classList.remove('flex');
         }
 
-        // Initialize
+        // Initialize App
         window.onload = loadData;
 
     </script>
