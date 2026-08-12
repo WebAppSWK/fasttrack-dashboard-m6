@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 V.2.4 | โรงเรียน ส.ว.</title>
+    <title>ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 | โรงเรียน ส.ว.</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -50,7 +50,7 @@
                     <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 <span class="text-[10px] font-black bg-brand-100 text-brand-700 px-2 py-0.5 rounded-md ml-1.5 border border-brand-200 align-text-bottom">V.2.4</span></h1>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 <span class="text-[10px] font-black bg-brand-100 text-brand-700 px-2 py-0.5 rounded-md ml-1.5 border border-brand-200 align-text-bottom">V.2.5</span></h1>
                     <p class="text-xs text-slate-500 font-medium">โครงการ Fast Track 2569 (ส.ว.)</p>
                 </div>
             </div>
@@ -124,7 +124,7 @@
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
                         <div class="bg-blue-100 p-3.5 rounded-full text-blue-600"><i data-lucide="users" class="w-6 h-6"></i></div>
                         <div>
-                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wide">จำนวนนักเรียนที่ประเมิน</p>
+                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wide">จำนวนนักเรียนที่เข้าสอบ</p>
                             <h3 id="kpi-count" class="text-3xl font-black text-slate-800">-- คน</h3>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
                         <div class="bg-rose-100 p-3.5 rounded-full text-rose-600"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
                         <div class="flex-1 min-w-0">
                             <p class="text-xs text-slate-400 font-bold uppercase tracking-wide">วิชาที่วิกฤตสุด</p>
-                            <h3 id="kpi-weakest" class="text-xl font-black text-slate-800 truncate whitespace-normal leading-tight">--</h3>
+                            <h3 id="kpi-weakest" class="text-xl font-black text-slate-800 whitespace-normal leading-tight">--</h3>
                         </div>
                     </div>
                 </div>
@@ -143,7 +143,7 @@
                         <i data-lucide="brain-circuit" class="w-64 h-64 text-indigo-200"></i>
                     </div>
                     <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2 relative z-10">
-                        <i data-lucide="lightbulb" class="w-5 h-5"></i> บทวิเคราะห์และยุทธศาสตร์การพัฒนา V.2.4
+                        <i data-lucide="lightbulb" class="w-5 h-5"></i> บทวิเคราะห์และยุทธศาสตร์การพัฒนา V.2.5
                     </h3>
                     <div id="dynamic-strategy-content" class="relative z-10">
                         <p class="text-slate-300 text-sm flex items-center gap-2"><i data-lucide="loader" class="w-4 h-4 animate-spin"></i> กำลังประมวลผลยุทธศาสตร์...</p>
@@ -216,8 +216,6 @@
         </div>
     </main>
 
-    <!-- Modals -->
-    
     <!-- Modal Blueprint -->
     <div id="modal-blueprint" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
@@ -235,36 +233,46 @@
     <!-- Modal Student Detail -->
     <div id="modal-student" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh] animate-fade-in-up">
-            <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center bg-slate-50 gap-4">
+            <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start bg-slate-50 gap-4">
                 <div>
                     <h3 class="font-black text-2xl text-slate-800" id="st-name">--</h3>
                     <p class="text-sm font-medium text-slate-500 mt-1" id="st-meta">--</p>
                 </div>
-                <div class="flex items-center gap-4 w-full md:w-auto">
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex-1 md:flex-none flex items-center justify-center gap-4">
-                        <div class="text-center">
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">คะแนนรวม</p>
-                            <p class="text-lg font-black text-brand-600 leading-none" id="st-total">0/0</p>
+                
+                <div class="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
+                    <!-- Advanced V.2.5 Scoreboard -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100 w-full md:w-auto">
+                        <div class="px-3 py-1 text-center">
+                            <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">รอบ 1</p>
+                            <p class="text-sm font-bold text-slate-600 leading-none" id="st-r1-score">0/0</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1" id="st-r1-pct">0.0%</p>
                         </div>
-                        <div class="w-px h-8 bg-slate-200"></div>
-                        <div class="text-center">
-                            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">เฉลี่ย</p>
-                            <p class="text-lg font-black text-emerald-600 leading-none" id="st-percent">0.00%</p>
+                        <div class="px-3 py-1 text-center bg-slate-50/50">
+                            <p class="text-[9px] uppercase tracking-wider text-brand-500 font-bold mb-0.5">รอบ 2 (ล่าสุด)</p>
+                            <p class="text-lg font-black text-brand-600 leading-none" id="st-r2-score">0/0</p>
+                            <p class="text-xs font-black text-brand-500 mt-0.5" id="st-r2-pct">0.0%</p>
+                        </div>
+                        <div class="px-3 py-1 text-center">
+                            <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">พัฒนาการ</p>
+                            <div id="st-diff-badge" class="mt-1"></div>
                         </div>
                     </div>
-                    <button onclick="closeModal('modal-student')" class="text-slate-400 hover:text-rose-500 bg-white border border-slate-200 hover:border-rose-200 hover:bg-rose-50 rounded-xl p-2.5 transition-colors self-start md:self-auto shadow-sm"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    
+                    <button onclick="closeModal('modal-student')" class="text-slate-400 hover:text-rose-500 bg-white border border-slate-200 hover:border-rose-200 hover:bg-rose-50 rounded-xl p-2.5 transition-colors self-end md:self-start shadow-sm"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
             </div>
+            
             <div class="p-6 overflow-y-auto">
-                <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bar-chart-2" class="text-brand-500 w-5 h-5"></i> กราฟคะแนนรายวิชาเปรียบเทียบ (จากเต็ม 100)</h4>
-                <div class="h-[300px] relative w-full"><canvas id="studentBarChart"></canvas></div>
+                <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bar-chart-2" class="text-brand-500 w-5 h-5"></i> กราฟเปรียบเทียบคะแนนรายวิชา (จากเต็ม 100)</h4>
+                <div class="h-[280px] relative w-full"><canvas id="studentBarChart"></canvas></div>
                 
-                <!-- CMU Prediction Section -->
+                <!-- Prediction Section V.2.5 -->
                 <div class="mt-8 border-t border-slate-100 pt-6">
-                    <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="graduation-cap" class="text-brand-500 w-5 h-5"></i> ประเมินโอกาสเข้าศึกษาต่อ มช. (3 อันดับแรก)</h4>
+                    <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="compass" class="text-brand-500 w-5 h-5"></i> สาขาที่น่าสนใจ</h4>
                     <div id="st-prediction" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- JS Injected Predictions -->
                     </div>
+                    <div class="mt-4 text-center text-[11px] text-slate-400 font-medium">ทั้งหมดนี้เป็นข้อมูลวิเคราะห์เบื้องต้น โปรดปรึกษาครูแนะแนวหรือผู้เชี่ยวชาญก่อนการตัดสินใจศึกษาต่อ</div>
                 </div>
             </div>
         </div>
@@ -314,6 +322,7 @@
         // Master Data Map
         let unifiedStudents = new Map();
         
+        // Defaults to 'compare' and 'all' as requested
         let state = {
             filter: 'all', 
             roundView: 'compare', 
@@ -323,32 +332,44 @@
         };
         let charts = {};
 
-        // Fallback Demo Data for Preview Environments
-        const demoMaster = `รหัสผู้สอบ,เลขที่,ห้อง,ชื่อ, สกุล
+        // Fallback Demo Data for Preview Environments (V.2.5 Perfect Mapping)
+        const demoMaster = `รหัสผู้สอบ,เลขที่,ห้อง,ชื่อ,สกุล
 29141,1,601,นางสาววิภาดา,โก
 29168,2,602,นางสาวจรัสวดี,บัวตูม
-29119,1,611,นฤภัทร,ปวนลุน
-29139,2,6/12,นางสาวฟ้าใส,ไชยวรรณ์
-88888,99,1,นายนิว,แมน`;
+29119,1,610,นายนฤภัทร,ปวนลุน
+29139,2,612,นางสาวฟ้าใส,ไชยวรรณ์
+88888,99,601,นายนิว,แมน
+29202,14,605,นางสาวณัฎฐณิชา,ปัญญา
+31020,21,608,นายศิวกร,ศรีคำหน้อย
+29308,5,602,นายปุณยวัจน์,ชีวีนิธิสกุล
+29220,27,610,นางสาวรมิดา,สิทธิชาติ`;
 
         const demoR1_Sci = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,รวมคณิต,ชีวะ,รวมชีวะ,ฟิสิกส์,รวมฟิสิกส์,ไทย,สังคม,เคมี,ภาษาอังกฤษ
 29141,1,นางสาววิภาดา,โก,15,45,12,60,15,50,40,65,58,60
-29168,2,นางสาวจรัสวดี,บัวตูม,12,30,17,40,6,20,42,40,30,35`;
+29168,2,นางสาวจรัสวดี,บัวตูม,12,30,17,40,6,20,42,40,30,35
+29202,14,นางสาวณัฎฐณิชา,ปัญญา,20,60,20,60,20,60,50,50,50,50
+31020,21,นายศิวกร,ศรีคำหน้อย,30,70,25,80,30,75,65,60,70,80
+29308,5,นายปุณยวัจน์,ชีวีนิธิสกุล,10,20,10,20,10,20,30,30,20,30`;
 
         const demoR2_Sci = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,อังกฤษ,สังคม,ภาษาไทย,เคมี,ฟิสิกส์,ชีววิทยา
 29141,1,นางสาววิภาดา,โก,55,75,80,50,60,55,70
 29168,2,นางสาวจรัสวดี,บัวตูม,20,30,35,40,25,15,30
-88888,99,นายนิว,แมน,80,80,80,80,80,80,80`;
+88888,99,นายนิว,แมน,80,80,80,80,80,80,80
+29202,14,นางสาวณัฎฐณิชา,ปัญญา,65,60,55,55,55,65,70
+31020,21,นายศิวกร,ศรีคำหน้อย,75,85,65,70,75,80,85
+29308,5,นายปุณยวัจน์,ชีวีนิธิสกุล,25,35,35,40,25,25,30`;
 
         const demoR1_Art = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,รวมคณิต,ภาษาไทย,สังคม,ภาษาอังกฤษ,วิทย์
-29119,1,นฤภัทร,ปวนลุน,12,30,28,32,59,26
-29139,2,นางสาวฟ้าใส,ไชยวรรณ์,30,50,42,26,44,26`;
+29119,1,นายนฤภัทร,ปวนลุน,12,30,28,32,59,26
+29139,2,นางสาวฟ้าใส,ไชยวรรณ์,30,50,42,26,44,26
+29220,27,นางสาวรมิดา,สิทธิชาติ,25,60,50,45,65,40`;
 
         const demoR2_Art = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,อังกฤษ,สังคม,วิทย์ประยุกต์,ภาษาไทย
-29119,1,นฤภัทร,ปวนลุน,40,70,50,30,40
-29139,2,นางสาวฟ้าใส,ไชยวรรณ์,35,40,20,20,40`;
+29119,1,นายนฤภัทร,ปวนลุน,40,70,50,30,40
+29139,2,นางสาวฟ้าใส,ไชยวรรณ์,35,40,20,20,40
+29220,27,นางสาวรมิดา,สิทธิชาติ,65,75,55,45,60`;
 
-        // Loading and parsing logic
+        // --- STREAMING_CHUNK:Data loading and extraction logic... ---
         async function loadData() {
             lucide.createIcons();
             const statusEl = document.getElementById('data-status');
@@ -401,7 +422,7 @@
                     } else throw new Error();
                 } catch(e) { processScoreJSON(Papa.parse(demoR2_Art, { header: true }).data, 'r2'); }
 
-                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ฐานข้อมูล V.2.4 สมบูรณ์';
+                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ฐานข้อมูล V.2.5 สมบูรณ์';
                 statusEl.className = 'px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-emerald-200 shadow-sm';
 
             } catch (error) {
@@ -413,35 +434,11 @@
             applyFilterAndRender();
         }
 
-        // --- STREAMING_CHUNK:Smart extraction for specific Excel files... ---
-        // Formatting helper
-        function parseRoomNumber(val, defaultFromSheet) {
-            if (!val || val === '-') return defaultFromSheet;
-            let str = String(val).trim();
-            let matchSlash = str.match(/6\/([1-9]|1[0-3])/);
-            if (matchSlash) return "6" + matchSlash[1].padStart(2, '0');
-            let matchExact = str.match(/60[1-9]|61[0-3]/);
-            if (matchExact) return matchExact[0];
-            let matchNum = str.match(/^([1-9]|1[0-3])$/);
-            if (matchNum) return "6" + matchNum[1].padStart(2, '0');
-            return defaultFromSheet;
-        }
-
-        // Advanced Worksheet Parser to get precise Room numbers from specific cells
+        // Advanced Worksheet Parser (V.2.5 Smart Room Extraction)
         function processMasterListWorksheet(worksheet, sheetName) {
-            // Read D2 for standard room number
-            let d2Val = worksheet['D2'] ? String(worksheet['D2'].v).trim() : '-';
-            let isCombinedSheet = sheetName.includes('611') || sheetName.includes('612');
-            
-            // Read specific cells for combined sheets
-            let roomE3 = worksheet['E3'] ? String(worksheet['E3'].v).trim() : '611';
-            let roomE21 = worksheet['E21'] ? String(worksheet['E21'].v).trim() : '612';
-            let roomE35 = worksheet['E35'] ? String(worksheet['E35'].v).trim() : '613';
-
-            // Convert to 2D array to know exactly which row each student is in
             let rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
             
-            let idCol = -1, nameCol = -1, surnameCol = -1;
+            let idCol = -1, nameCol = -1, surnameCol = -1, roomCol = -1, noCol = -1;
             let headerRowIdx = -1;
             
             // Scan for headers in first 5 rows
@@ -451,6 +448,8 @@
                     if(val.includes('รหัส') || val.includes('เลขประจำตัว')) idCol = c;
                     if(val === 'ชื่อ' || val.includes('ชื่อ')) nameCol = c;
                     if(val.includes('สกุล')) surnameCol = c;
+                    if(val === 'ห้อง' || val === 'ชั้น' || val.includes('ห้อง')) roomCol = c;
+                    if(val === 'เลขที่' || val === 'ลำดับ' || val === 'no') noCol = c;
                 }
                 if(idCol !== -1 && nameCol !== -1) {
                     headerRowIdx = r;
@@ -459,6 +458,13 @@
             }
 
             if(idCol === -1 || nameCol === -1) return;
+
+            // Fallback: If room column not found, try to guess from Sheet Name
+            let fallbackRoom = '-';
+            let sheetRoomMatch = sheetName.match(/6\/?(0[1-9]|1[0-3])/); // Matches 601, 6/1, 6/13, 613 etc.
+            if(sheetRoomMatch) {
+                fallbackRoom = "6" + sheetRoomMatch[1].padStart(2, '0');
+            }
 
             // Extract students row by row
             for(let r = headerRowIdx + 1; r < rows.length; r++) {
@@ -471,20 +477,24 @@
                 
                 let key = String(id).trim();
                 let fullName = `${name} ${surname}`.trim().replace('(ขาด)', '');
-                if (fullName.includes("นฤภัทร ปวนลุน")) fullName = "นายนฤภัทร ปวนลุน";
                 
-                let actualRow = r + 1; // 1-based indexing for Excel row logic
-                let assignedRoom = d2Val;
+                // Hardcoded name fixes
+                if (fullName.includes("นฤภัทร ปวนลุน") && !fullName.startsWith("นาย")) fullName = "นายนฤภัทร ปวนลุน";
                 
-                // Smart Room Assignment logic for '611-612-613' sheet
-                if(isCombinedSheet) {
-                    if(actualRow >= 3 && actualRow < 21) assignedRoom = roomE3;
-                    else if (actualRow >= 21 && actualRow < 35) assignedRoom = roomE21;
-                    else if (actualRow >= 35) assignedRoom = roomE35;
+                let assignedRoom = fallbackRoom;
+                if(roomCol !== -1 && row[roomCol]) {
+                    let rVal = String(row[roomCol]).trim();
+                    let m = rVal.match(/6\/?(0[1-9]|1[0-3])/);
+                    if(m) assignedRoom = "6" + m[1].padStart(2, '0');
+                }
+
+                let studentNo = 999;
+                if(noCol !== -1 && row[noCol]) {
+                    studentNo = parseInt(row[noCol]) || 999;
                 }
 
                 unifiedStudents.set(key, {
-                    id: key, name: fullName, room: parseRoomNumber(assignedRoom, sheetName),
+                    id: key, name: fullName, room: assignedRoom, no: studentNo,
                     stream: 'science', // Temp default
                     r1Obj: null, r2Obj: null
                 });
@@ -493,8 +503,6 @@
 
         // Dummy processor for Fallback mode
         function processMasterListDummy(data, sheetName) {
-            let defaultRoom = sheetName.match(/60[1-9]|61[0-3]/) ? sheetName.match(/60[1-9]|61[0-3]/)[0] : '-';
-            
             function findValueByKeyword(row, keywords) {
                 let rowKeys = Object.keys(row);
                 for (let kw of keywords) {
@@ -510,24 +518,35 @@
                 let id = findValueByKeyword(row, ['รหัส', 'เลขประจำตัว']);
                 let name = findValueByKeyword(row, ['ชื่อ']);
                 let surname = findValueByKeyword(row, ['สกุล', 'นามสกุล']) || '';
-                let roomCol = findValueByKeyword(row, ['ห้อง', 'ชั้น']);
+                let roomCol = findValueByKeyword(row, ['ห้อง', 'ชั้น']) || '-';
+                let noCol = findValueByKeyword(row, ['เลขที่', 'ลำดับ', 'no']) || '999';
                 
                 if (!id || !name || String(id).includes('รหัส')) return;
                 let key = String(id).trim();
                 let fullName = `${name} ${surname}`.trim().replace('(ขาด)', '');
-                if (fullName.includes("นฤภัทร ปวนลุน")) fullName = "นายนฤภัทร ปวนลุน";
+                if (fullName.includes("นฤภัทร ปวนลุน") && !fullName.startsWith("นาย")) fullName = "นายนฤภัทร ปวนลุน";
+
+                let rMatch = roomCol.match(/6\/?(0[1-9]|1[0-3])/);
+                let cleanRoom = rMatch ? "6" + rMatch[1].padStart(2, '0') : roomCol;
 
                 unifiedStudents.set(key, {
-                    id: key, name: fullName, room: parseRoomNumber(roomCol, defaultRoom),
+                    id: key, name: fullName, room: cleanRoom, no: parseInt(noCol) || 999,
                     stream: 'science', r1Obj: null, r2Obj: null
                 });
             });
         }
 
+        // --- STREAMING_CHUNK:Score merging and calculation... ---
         function processScoreJSON(data, roundStr) {
             if (!data || data.length === 0) return;
             const headers = Object.keys(data[0]);
-            const isScience = headers.some(h => h.includes('ฟิสิกส์') || h.includes('ชีว') || h.includes('เคมี'));
+            
+            // Smarter Stream detection (checking keys deeply)
+            let isScience = false;
+            for(let h of headers) {
+                let hl = h.toLowerCase();
+                if(hl.includes('ฟิสิกส์') || hl.includes('ชีว') || hl.includes('เคมี')) { isScience = true; break; }
+            }
             const streamStr = isScience ? 'science' : 'art';
             const maxSubjects = isScience ? 7 : 5;
 
@@ -558,13 +577,18 @@
                 if (!unifiedStudents.has(key)) {
                     let surname = findValueByKeyword(row, ['สกุล']) || '';
                     let fullName = `${name || 'Unknown'} ${surname}`.trim().replace('(ขาด)', '');
-                    if (fullName.includes("นฤภัทร ปวนลุน")) fullName = "นายนฤภัทร ปวนลุน";
-                    unifiedStudents.set(key, { id: key, name: fullName, room: '-', stream: streamStr, r1Obj: null, r2Obj: null });
+                    if (fullName.includes("นฤภัทร ปวนลุน") && !fullName.startsWith("นาย")) fullName = "นายนฤภัทร ปวนลุน";
+                    unifiedStudents.set(key, { id: key, name: fullName, room: '-', no: 999, stream: streamStr, r1Obj: null, r2Obj: null });
                 }
 
                 let student = unifiedStudents.get(key);
                 student.stream = streamStr; 
-                student.no = parseInt(findValueByKeyword(row, ['เลขที่'])) || 999;
+                
+                // Optional: update No if missing
+                if(student.no === 999) {
+                    let parseNo = parseInt(findValueByKeyword(row, ['เลขที่']));
+                    if(parseNo) student.no = parseNo;
+                }
 
                 let scoreObj = { scores: {}, totalScore: 0, maxScore: maxSubjects * 100, isMissing: false, percent: 0 };
                 let sum = 0, hasAnyScore = false;
@@ -634,29 +658,64 @@
             return valid.length > 0 ? valid.reduce((a,b)=>a+b, 0)/valid.length : 0;
         }
 
-        // UI Updates with timeout to prevent blocking thread
         function setFilter(type) {
             state.filter = type;
-            document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active', 'bg-slate-800', 'text-white', 'text-sky-700', 'text-amber-600'); b.classList.add('bg-white'); });
             
-            let btn = document.getElementById(type === 'all' ? 'btn-filter-all' : type === 'science' ? 'btn-filter-sci' : 'btn-filter-art');
-            btn.classList.add('active', 'text-white');
-            if (type === 'all') btn.classList.add('bg-slate-800', 'border-slate-800');
-            else if (type === 'science') btn.classList.add('bg-sky-600', 'border-sky-600');
-            else btn.classList.add('bg-amber-500', 'border-amber-500');
+            // 1. รีเซ็ตปุ่มทั้งหมดให้กลับเป็นสีพื้นฐาน (ไม่ค้าง)
+            const btnAll = document.getElementById('btn-filter-all');
+            const btnSci = document.getElementById('btn-filter-sci');
+            const btnArt = document.getElementById('btn-filter-art');
             
-            // Defer render to allow button CSS state to paint first
-            setTimeout(applyFilterAndRender, 50);
+            btnAll.className = "filter-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 bg-white text-slate-700";
+            btnSci.className = "filter-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 bg-white text-sky-700";
+            btnArt.className = "filter-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 bg-white text-amber-600";
+
+            // 2. เติมสีให้ปุ่มที่ถูกคลิก
+            if (type === 'all') {
+                btnAll.className = "filter-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-800 text-sm font-medium transition-all bg-slate-800 text-white";
+            } else if (type === 'science') {
+                btnSci.className = "filter-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-sky-600 text-sm font-medium transition-all bg-sky-600 text-white";
+            } else if (type === 'art') {
+                btnArt.className = "filter-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-amber-500 text-sm font-medium transition-all bg-amber-500 text-white";
+            }
+            
+            // 3. บังคับให้เบราว์เซอร์แสดงผลสีปุ่มให้เสร็จก่อน แล้วค่อยประมวลผลกราฟ (แก้ปัญหาปุ่มค้าง)
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    applyFilterAndRender();
+                }, 50);
+            });
         }
 
         function setRoundView(view) {
             state.roundView = view;
-            document.querySelectorAll('.round-btn').forEach(b => b.classList.remove('active'));
-            let btn = document.getElementById(view === 'round1' ? 'btn-round-1' : view === 'round2' ? 'btn-round-2' : 'btn-round-cmp');
-            btn.classList.add('active');
+            
+            // 1. รีเซ็ตปุ่มทั้งหมดให้กลับเป็นสีพื้นฐาน (ไม่ค้าง)
+            const btn1 = document.getElementById('btn-round-1');
+            const btn2 = document.getElementById('btn-round-2');
+            const btnCmp = document.getElementById('btn-round-cmp');
+            
+            btn1.className = "round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 bg-white text-slate-700";
+            btn2.className = "round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 bg-white text-slate-700";
+            btnCmp.className = "round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-bold transition-all hover:bg-slate-50 bg-white text-amber-600 shadow-sm";
+
+            // 2. เติมสีให้ปุ่มที่ถูกคลิก
+            if (view === 'round1') {
+                btn1.className = "round-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-brand-600 text-sm font-medium transition-all bg-brand-600 text-white";
+            } else if (view === 'round2') {
+                btn2.className = "round-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-brand-600 text-sm font-medium transition-all bg-brand-600 text-white";
+            } else if (view === 'compare') {
+                btnCmp.className = "round-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-amber-500 text-sm font-bold transition-all bg-amber-500 text-white shadow-sm";
+            }
             
             document.getElementById('th-dev').classList.toggle('hidden', view !== 'compare');
-            setTimeout(applyFilterAndRender, 50);
+            
+            // 3. บังคับให้เบราว์เซอร์แสดงผลสีปุ่มให้เสร็จก่อน แล้วค่อยประมวลผลกราฟ (แก้ปัญหาปุ่มค้าง)
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    applyFilterAndRender();
+                }, 50);
+            });
         }
 
         function switchTab(tabId) {
@@ -666,6 +725,7 @@
             document.getElementById('btn-' + tabId).classList.add('active', 'border-brand-600', 'text-brand-900');
         }
 
+        // --- STREAMING_CHUNK:Rendering KPIs and text updates... ---
         function applyFilterAndRender() {
             let students = getActiveStudentsList();
             let valid = students.filter(s => !s.isMissing);
@@ -702,7 +762,7 @@
             renderTable();
         }
 
-        // --- STREAMING_CHUNK:Rendering Executive Briefs & Complex ChartJS objects... ---
+        // --- STREAMING_CHUNK:Rendering Executive Briefs & Charts... ---
         function renderExecutiveBrief(students) {
             const container = document.getElementById('dynamic-strategy-content');
             let subjAvg = [];
@@ -854,7 +914,7 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Rendering Rings, Table, Blueprint and CMU Prediction Modal ---
+        // --- STREAMING_CHUNK:Rendering Rings, Table, Blueprint and CMU Prediction Modal... ---
         function renderSubjectRings(students) {
             const container = document.getElementById('ring-charts-container');
             container.innerHTML = '';
@@ -944,9 +1004,9 @@
                         let color = s.diffPercent > 0 ? 'text-emerald-600' : s.diffPercent < 0 ? 'text-rose-600' : 'text-slate-500';
                         devCol = `<td class="px-5 py-4 font-black ${color} bg-amber-50/50">${s.diffPercent>0?'▲ +':s.diffPercent<0?'▼ ':''}${s.diffPercent.toFixed(2)}%</td>`;
                     } else if (hasR2) {
-                        devCol = `<td class="px-5 py-4 bg-amber-50/50"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-md border border-blue-200">เฉพาะรอบ 2</span></td>`;
+                        devCol = `<td class="px-5 py-4 bg-amber-50/50"><span class="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-md border border-blue-200">มีเฉพาะรอบ 2</span></td>`;
                     } else if (hasR1) {
-                        devCol = `<td class="px-5 py-4 bg-amber-50/50"><span class="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md border border-slate-200">เฉพาะรอบ 1</span></td>`;
+                        devCol = `<td class="px-5 py-4 bg-amber-50/50"><span class="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md border border-slate-200">มีเฉพาะรอบ 1</span></td>`;
                     } else {
                         devCol = `<td class="px-5 py-4 bg-amber-50/50"><span class="text-xs text-slate-300">-</span></td>`;
                     }
@@ -1012,8 +1072,27 @@
 
             document.getElementById('st-name').innerText = student.name;
             document.getElementById('st-meta').innerText = `รหัส: ${student.id} | ห้อง: ${student.room} | เลขที่: ${student.no} | ${student.stream === 'science' ? 'สายวิทย์-คณิต' : 'สายศิลป์'}`;
-            document.getElementById('st-total').innerText = student.isMissing ? '-' : `${student.totalScore.toFixed(1)}`;
-            document.getElementById('st-percent').innerText = student.isMissing ? '-' : `${student.percent.toFixed(2)}%`;
+            
+            // Explicitly calculate R1 and R2 for the top modal header
+            let r1Score = (student.r1Obj && !student.r1Obj.isMissing) ? student.r1Obj.totalScore : 0;
+            let r1Pct = (student.r1Obj && !student.r1Obj.isMissing) ? student.r1Obj.percent : 0;
+            let r2Score = (student.r2Obj && !student.r2Obj.isMissing) ? student.r2Obj.totalScore : 0;
+            let r2Pct = (student.r2Obj && !student.r2Obj.isMissing) ? student.r2Obj.percent : 0;
+            let diffPct = r2Pct - r1Pct;
+
+            document.getElementById('st-r1-score').innerText = r1Score > 0 ? r1Score.toFixed(1) : '-';
+            document.getElementById('st-r1-pct').innerText = r1Pct > 0 ? r1Pct.toFixed(1) + '%' : '-';
+            
+            document.getElementById('st-r2-score').innerText = r2Score > 0 ? r2Score.toFixed(1) : '-';
+            document.getElementById('st-r2-pct').innerText = r2Pct > 0 ? r2Pct.toFixed(1) + '%' : '-';
+
+            let diffBadge = document.getElementById('st-diff-badge');
+            if (r1Score > 0 && r2Score > 0) {
+                let diffColor = diffPct > 0 ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : diffPct < 0 ? 'text-rose-600 bg-rose-50 border-rose-200' : 'text-slate-600 bg-slate-50 border-slate-200';
+                diffBadge.innerHTML = `<span class="px-2 py-1 rounded-md text-[10px] font-black border ${diffColor}">${diffPct > 0 ? '▲ +'+diffPct.toFixed(1) : diffPct < 0 ? '▼ '+diffPct.toFixed(1) : '0'}%</span>`;
+            } else {
+                diffBadge.innerHTML = `<span class="px-2 py-1 rounded-md text-[9px] font-bold bg-slate-100 text-slate-400 border border-slate-200">ไม่มีผลเทียบ</span>`;
+            }
 
             const ctx = document.getElementById('studentBarChart').getContext('2d');
             if (charts.studentBar) charts.studentBar.destroy();
@@ -1023,39 +1102,31 @@
                 if(subj.stream && subj.stream !== student.stream) return;
                 labels.push(subj.name);
                 colors.push(`rgb(${subj.hex})`);
-                lightColors.push(`rgba(${subj.hex}, 0.4)`);
+                lightColors.push(`rgba(${subj.hex}, 0.3)`);
                 
-                if(state.roundView === 'compare') {
-                    dataR1.push((student.r1Obj && !student.r1Obj.isMissing) ? student.r1Obj.scores[key] : 0);
-                    dataR2.push((student.r2Obj && !student.r2Obj.isMissing) ? student.r2Obj.scores[key] : 0);
-                } else {
-                    let target = state.roundView === 'round1' ? student.r1Obj : student.r2Obj;
-                    dataR2.push((target && !target.isMissing) ? target.scores[key] : 0);
-                }
+                // ALWAYS push both R1 and R2 for comparison in the detail view
+                dataR1.push((student.r1Obj && !student.r1Obj.isMissing) ? student.r1Obj.scores[key] : 0);
+                dataR2.push((student.r2Obj && !student.r2Obj.isMissing) ? student.r2Obj.scores[key] : 0);
             });
 
             let datasets = [];
-            if(state.roundView === 'compare') {
-                datasets.push({ label: 'รอบ 1', data: dataR1, backgroundColor: lightColors, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 });
-                datasets.push({ label: 'รอบ 2', data: dataR2, backgroundColor: colors, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 });
-            } else {
-                datasets.push({ label: 'คะแนน', data: dataR2, backgroundColor: colors, borderRadius: 6, barPercentage: 0.6 });
-            }
-
+            datasets.push({ label: 'รอบ 1', data: dataR1, backgroundColor: lightColors, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 });
+            datasets.push({ label: 'รอบ 2 (ล่าสุด)', data: dataR2, backgroundColor: colors, borderRadius: 4, barPercentage: 0.8, categoryPercentage: 0.9 });
+            
             charts.studentBar = new Chart(ctx, {
                 type: 'bar',
                 data: { labels: labels, datasets: datasets },
                 options: {
                     indexAxis: 'y', responsive: true, maintainAspectRatio: false,
                     plugins: { 
-                        legend: { display: state.roundView === 'compare', position: 'top' },
+                        legend: { display: true, position: 'top' },
                         datalabels: { display: true, anchor: 'end', align: 'end', font: { weight: 'bold', size: 10 }, formatter: v => v>0?v.toFixed(1):'' }
                     },
                     scales: { x: { max: 100, ticks: { stepSize: 20 } }, y: { grid: { display: false } } }
                 }
             });
 
-            // --- CMU Faculty Prediction Logic ---
+            // --- V.2.5 CMU Faculty Prediction Logic (Colorful) ---
             let baseScore = student.r2Obj && !student.r2Obj.isMissing ? student.r2Obj : (student.r1Obj && !student.r1Obj.isMissing ? student.r1Obj : null);
             if(baseScore) {
                 let preds = [];
@@ -1064,22 +1135,22 @@
                 
                 if(student.stream === 'science') {
                     if(pct>=55 && s.math>=50 && s.phys>=50) preds.push({fac:'วิศวกรรมศาสตร์', prob:'มีลุ้นสูง', color:'emerald', icon:'cpu'});
-                    else preds.push({fac:'วิศวกรรมศาสตร์', prob:'ต้องฮึดเพิ่ม', color:'amber', icon:'cpu'});
+                    else preds.push({fac:'วิศวกรรมศาสตร์', prob:'ต้องฮึดเพิ่ม', color:'rose', icon:'cpu'});
                     
-                    if(pct>=60 && s.bio>=55 && s.chem>=55) preds.push({fac:'กลุ่มวิทยาศาสตร์สุขภาพ', prob:'มีลุ้นสูง', color:'emerald', icon:'heart'});
+                    if(pct>=60 && s.bio>=55 && s.chem>=55) preds.push({fac:'กลุ่มวิทยาศาสตร์สุขภาพ', prob:'มีลุ้นสูง', color:'blue', icon:'heart'});
                     else preds.push({fac:'กลุ่มวิทยาศาสตร์สุขภาพ', prob:'ต้องฮึดเพิ่ม', color:'amber', icon:'heart'});
                     
-                    if(pct>=50 && s.eng>=50) preds.push({fac:'วิทยาศาสตร์ / ไอที', prob:'มีลุ้นสูง', color:'emerald', icon:'monitor'});
-                    else preds.push({fac:'วิทยาศาสตร์ / ไอที', prob:'พอมีโอกาส', color:'amber', icon:'monitor'});
+                    if(pct>=50 && s.eng>=50) preds.push({fac:'วิทยาศาสตร์ / ไอที', prob:'มีลุ้นสูง', color:'purple', icon:'monitor'});
+                    else preds.push({fac:'วิทยาศาสตร์ / ไอที', prob:'พอมีโอกาส', color:'teal', icon:'monitor'});
                 } else {
-                    if(pct>=55 && s.eng>=55) preds.push({fac:'มนุษยศาสตร์ / ศิลปศาสตร์', prob:'มีลุ้นสูง', color:'emerald', icon:'book-open'});
-                    else preds.push({fac:'มนุษยศาสตร์ / ศิลปศาสตร์', prob:'ต้องฮึดเพิ่ม', color:'amber', icon:'book-open'});
+                    if(pct>=55 && s.eng>=55) preds.push({fac:'มนุษยศาสตร์ / ศิลปศาสตร์', prob:'มีลุ้นสูง', color:'purple', icon:'book-open'});
+                    else preds.push({fac:'มนุษยศาสตร์ / ศิลปศาสตร์', prob:'ต้องฮึดเพิ่ม', color:'rose', icon:'book-open'});
                     
-                    if(pct>=50 && s.social>=50 && s.thai>=50) preds.push({fac:'นิติศาสตร์ / รัฐศาสตร์', prob:'มีลุ้นสูง', color:'emerald', icon:'scale'});
+                    if(pct>=50 && s.social>=50 && s.thai>=50) preds.push({fac:'นิติศาสตร์ / รัฐศาสตร์', prob:'มีลุ้นสูง', color:'blue', icon:'scale'});
                     else preds.push({fac:'นิติศาสตร์ / รัฐศาสตร์', prob:'ต้องฮึดเพิ่ม', color:'amber', icon:'scale'});
                     
                     if(pct>=50 && s.math>=40) preds.push({fac:'บริหารธุรกิจ / บัญชี', prob:'มีลุ้นสูง', color:'emerald', icon:'pie-chart'});
-                    else preds.push({fac:'บริหารธุรกิจ', prob:'พอมีโอกาส', color:'amber', icon:'pie-chart'});
+                    else preds.push({fac:'บริหารธุรกิจ', prob:'พอมีโอกาส', color:'teal', icon:'pie-chart'});
                 }
                 
                 document.getElementById('st-prediction').innerHTML = preds.map((p, i) => `
