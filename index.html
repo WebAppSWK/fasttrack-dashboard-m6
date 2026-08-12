@@ -4,202 +4,247 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 | โรงเรียน ส.ว.</title>
+    
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'Sarabun', 'sans-serif'] },
-                    colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' } }
+        window.tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        fontFamily: { sans: ['Inter', 'Sarabun', 'sans-serif'] },
+                        colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 900: '#1e3a8a' } }
+                    }
                 }
             }
         }
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Chart.js & DataLabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    <!-- SheetJS (XLSX Parser) -->
+    
+    <!-- SheetJS สำหรับอ่านไฟล์ Excel อัตโนมัติ -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- PapaParse -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         body { font-family: 'Sarabun', 'Inter', sans-serif; }
         .tab-btn.active { border-bottom: 2px solid #2563eb; color: #1e3a8a; font-weight: 600; }
         .filter-btn.active { background-color: #1e3a8a; color: white; border-color: #1e3a8a; }
-        /* Custom Scrollbar for tables */
+        .round-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
+        .round-btn-compare.active { background-color: #d97706; color: white; border-color: #d97706; }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        th.sortable:hover { background-color: #f8fafc; cursor: pointer; }
+        th.sortable:hover { background-color: #e2e8f0; cursor: pointer; transition: background-color 0.2s; }
+        
+        .ring-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="h-full flex flex-col text-slate-800">
 
     <!-- Navbar -->
-    <nav class="bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-10">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 shadow-sm z-10 sticky top-0">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-md">
-                    <i data-lucide="bar-chart-2"></i>
+                <div class="bg-brand-600 p-2.5 rounded-xl text-white shadow-md shadow-brand-500/30">
+                    <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
                 </div>
                 <div>
                     <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6</h1>
                     <p class="text-xs text-slate-500 font-medium">โครงการ Fast Track - พฤษภาคม 2569 (ส.ว.)</p>
                 </div>
             </div>
-            <div class="flex items-center gap-4">
-                <span id="data-status" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm border border-yellow-200">
-                    <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> กำลังโหลดข้อมูล
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <span id="data-status" class="px-3 py-1.5 bg-yellow-50 text-yellow-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-yellow-200 shadow-sm transition-all duration-300">
+                    <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> กำลังโหลดไฟล์ Excel...
                 </span>
-                <button onclick="openSettings()" class="p-2 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-full transition-colors border border-transparent hover:border-brand-100">
-                    <i data-lucide="settings"></i>
+                <button onclick="openSettings()" class="p-2 text-slate-400 hover:text-brand-600 bg-slate-50 hover:bg-brand-50 rounded-full transition-colors border border-slate-200">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Workspace -->
     <main class="flex-1 overflow-auto bg-slate-50 p-4 sm:p-6">
         <div class="max-w-7xl mx-auto space-y-6">
             
-            <!-- Global Filter -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div class="text-sm font-bold text-slate-600 flex items-center gap-2">
-                    <div class="bg-brand-100 p-1.5 rounded-lg text-brand-600"><i data-lucide="filter" class="w-4 h-4"></i></div>
-                    มุมมองข้อมูล (Global Filter)
+            <!-- Dashboard Controls -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col lg:flex-row gap-5 items-center justify-between">
+                
+                <!-- Stream Filter -->
+                <div class="flex flex-col sm:flex-row gap-3 items-center w-full lg:w-auto">
+                    <div class="text-sm font-bold text-slate-700 flex items-center gap-2 whitespace-nowrap bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <i data-lucide="filter" class="w-4 h-4 text-brand-600"></i> กลุ่มเป้าหมาย
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto p-1 bg-slate-50 rounded-xl border border-slate-200/80">
+                        <button onclick="setFilter('all')" id="btn-filter-all" class="filter-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-white text-slate-600 border border-transparent">🌐 ภาพรวมทั้งหมด</button>
+                        <button onclick="setFilter('science')" id="btn-filter-sci" class="filter-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-white text-slate-600 border border-transparent">🔬 สายวิทย์-คณิต</button>
+                        <button onclick="setFilter('art')" id="btn-filter-art" class="filter-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-white text-slate-600 border border-transparent">🎨 สายศิลป์</button>
+                    </div>
                 </div>
-                <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="setFilter('all')" id="btn-filter-all" class="filter-btn active flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">🌐 ภาพรวม</button>
-                    <button onclick="setFilter('science')" id="btn-filter-sci" class="filter-btn flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">🔬 วิทย์-คณิต</button>
-                    <button onclick="setFilter('art')" id="btn-filter-art" class="filter-btn flex-1 sm:flex-none px-4 py-2 rounded-xl border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">🎨 สายศิลป์</button>
+
+                <div class="w-full lg:w-px h-px lg:h-10 bg-slate-200"></div>
+
+                <!-- Timeline Filter -->
+                <div class="flex flex-col sm:flex-row gap-3 items-center w-full lg:w-auto">
+                    <div class="text-sm font-bold text-slate-700 flex items-center gap-2 whitespace-nowrap bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">
+                        <i data-lucide="calendar-clock" class="w-4 h-4 text-indigo-600"></i> รอบการสอบ
+                    </div>
+                    <div class="flex gap-2 w-full sm:w-auto p-1 bg-slate-50 rounded-xl border border-slate-200/80">
+                        <button onclick="setRound('r1')" id="btn-round-r1" class="round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-white text-slate-600 border border-transparent">📊 ดูรอบแรก</button>
+                        <button onclick="setRound('r2')" id="btn-round-r2" class="round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-white text-slate-600 border border-transparent">📊 ดูรอบสอง</button>
+                        <button onclick="setRound('compare')" id="btn-round-compare" class="round-btn-compare active flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-bold transition-all hover:bg-white text-amber-700 border border-transparent">⚖️ เทียบพัฒนาการ</button>
+                    </div>
                 </div>
             </div>
 
             <!-- Tabs Navigation -->
-            <div class="flex border-b border-slate-200 gap-6 px-2 overflow-x-auto">
-                <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
-                    <i data-lucide="target" class="w-4 h-4"></i> ภาพรวมยุทธศาสตร์
-                </button>
-                <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
-                    <i data-lucide="pie-chart" class="w-4 h-4"></i> ผลสัมฤทธิ์รายวิชา
-                </button>
-                <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn pb-3 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
-                    <i data-lucide="users" class="w-4 h-4"></i> บัญชีรายชื่อ
-                </button>
+            <div class="flex border-b border-slate-200 gap-2 sm:gap-8 overflow-x-auto px-2">
+                <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active pb-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap"><i data-lucide="target" class="w-4 h-4"></i> ภาพรวมยุทธศาสตร์</button>
+                <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn pb-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap"><i data-lucide="pie-chart" class="w-4 h-4"></i> ผลสัมฤทธิ์รายวิชา</button>
+                <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn pb-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap"><i data-lucide="users" class="w-4 h-4"></i> บัญชีรายชื่อ</button>
             </div>
 
-            <!-- Tab 1: Strategy Overview -->
+            <!-- TAB 1: Overview -->
             <div id="tab1" class="space-y-6">
                 <!-- KPIs Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
-                        <div class="bg-emerald-100 p-3.5 rounded-xl text-emerald-600"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
-                        <div>
-                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">ผลสัมฤทธิ์รวม</p>
-                            <h3 id="kpi-avg" class="text-2xl font-bold text-slate-800">--%</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-10 -mt-10 transition-all group-hover:bg-emerald-100"></div>
+                        <div class="bg-gradient-to-br from-emerald-400 to-emerald-600 p-4 rounded-xl text-white shadow-lg shadow-emerald-200 relative z-10"><i data-lucide="trending-up" class="w-6 h-6"></i></div>
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ผลสัมฤทธิ์รวม (Non-Zero Mean)</p>
+                            <div class="flex items-end gap-2 mt-1">
+                                <h3 id="kpi-avg" class="text-3xl font-black text-slate-800">--%</h3>
+                                <span id="kpi-avg-diff" class="text-sm font-bold mb-1 hidden"></span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
-                        <div class="bg-blue-100 p-3.5 rounded-xl text-blue-600"><i data-lucide="users" class="w-6 h-6"></i></div>
-                        <div>
-                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">จำนวนนักเรียนที่ประเมิน</p>
-                            <h3 id="kpi-count" class="text-2xl font-bold text-slate-800">-- คน</h3>
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-4 hover:shadow-md transition-shadow">
-                        <div class="bg-rose-100 p-3.5 rounded-xl text-rose-600"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
-                        <div>
-                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">วิชาที่ควรปรับปรุงเร่งด่วน</p>
-                            <h3 id="kpi-weakest" class="text-xl font-bold text-rose-600">--</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Strategic Summary AI/Data Analysis Block -->
-                <div class="bg-gradient-to-br from-brand-900 to-indigo-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden border border-indigo-800">
-                    <div class="absolute right-0 top-0 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-                        <i data-lucide="cpu" class="w-64 h-64"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
-                        <i data-lucide="lightbulb" class="w-5 h-5"></i> สรุปข้อวิเคราะห์และแผนยุทธศาสตร์ (Strategic Recommendations)
-                    </h3>
-                    <div id="dynamic-strategy-content" class="relative z-10">
-                        <!-- Dynamic Content Injected Here -->
-                        <div class="text-slate-300 text-sm flex items-center gap-2"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังประมวลผลข้อมูลยุทธศาสตร์...</div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="space-y-6">
-                    <!-- Bar Chart (Full Width) -->
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                            <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><i data-lucide="bar-chart-horizontal" class="text-brand-600"></i> เปรียบเทียบผลสัมฤทธิ์ 4 วิชาแกนหลัก (%)</h3>
-                            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium mt-2 sm:mt-0">Dynamic Scale & Labels</span>
-                        </div>
-                        <div class="h-72"><canvas id="coreBarChart"></canvas></div>
                     </div>
                     
-                    <!-- Radar Charts Grid -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Radar Chart Sci -->
-                        <div id="radar-container-sci" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <div class="flex justify-between items-start mb-6">
-                                <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><i data-lucide="radar" class="text-blue-500"></i> กราฟเปรียบเทียบผลสัมฤทธิ์ (สายวิทย์-คณิต)</h3>
-                            </div>
-                            <div class="h-72 relative flex justify-center"><canvas id="radarChartSci"></canvas></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-10 -mt-10 transition-all group-hover:bg-blue-100"></div>
+                        <div class="bg-gradient-to-br from-blue-500 to-brand-600 p-4 rounded-xl text-white shadow-lg shadow-blue-200 relative z-10"><i data-lucide="users" class="w-6 h-6"></i></div>
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">จำนวนนักเรียนที่ประเมิน</p>
+                            <h3 id="kpi-count" class="text-3xl font-black text-slate-800 mt-1">-- <span class="text-base font-semibold text-slate-500">คน</span></h3>
                         </div>
-                        <!-- Radar Chart Art -->
-                        <div id="radar-container-art" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                            <div class="flex justify-between items-start mb-6">
-                                <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><i data-lucide="radar" class="text-amber-500"></i> กราฟเปรียบเทียบผลสัมฤทธิ์ (สายศิลป์)</h3>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-rose-50 rounded-full blur-2xl -mr-10 -mt-10 transition-all group-hover:bg-rose-100"></div>
+                        <div class="bg-gradient-to-br from-rose-400 to-rose-600 p-4 rounded-xl text-white shadow-lg shadow-rose-200 relative z-10"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
+                        <div class="relative z-10">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">วิชาที่ควรปรับปรุงเร่งด่วน</p>
+                            <h3 id="kpi-weakest" class="text-xl font-black text-slate-800 mt-1 truncate max-w-[150px]">--</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategy Analysis Panel -->
+                <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden border border-slate-800">
+                    <div class="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+                        <i data-lucide="compass" class="w-64 h-64 text-brand-500"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-400 mb-4 flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="text-yellow-400 w-5 h-5"></i> สรุปข้อวิเคราะห์และแผนยุทธศาสตร์
+                    </h3>
+                    <div id="strategy-brief-container" class="relative z-10 space-y-3">
+                        <!-- Strategy injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Charts Area -->
+                <div class="space-y-6">
+                    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2"><i data-lucide="bar-chart-horizontal" class="text-brand-500 w-5 h-5"></i> เปรียบเทียบผลสัมฤทธิ์ 4 วิชาแกนหลัก (%)</h3>
+                                <p class="text-xs text-slate-500 mt-1">แสดงเฉพาะวิชาแกนหลักที่สอบร่วมกันทั้ง 2 สายการเรียน</p>
                             </div>
-                            <div class="h-72 relative flex justify-center"><canvas id="radarChartArt"></canvas></div>
+                            <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-1 rounded-full uppercase tracking-wider">Dynamic Scale</span>
+                        </div>
+                        <div class="h-[320px]"><canvas id="coreBarChart"></canvas></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Science Radar -->
+                        <div id="radar-wrapper-sci" class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+                            <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-4">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2"><i data-lucide="radar" class="text-blue-500 w-5 h-5"></i> กราฟเปรียบเทียบผลสัมฤทธิ์รายวิชา</h3>
+                                    <p class="text-[11px] text-slate-500 mt-1 font-semibold">กลุ่ม: <span class="text-blue-600">สายวิทย์-คณิต (7 วิชา)</span></p>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded-md uppercase">Close-Scale</span>
+                            </div>
+                            <div class="h-[320px] relative flex-1 flex justify-center w-full"><canvas id="radarChartSci"></canvas></div>
+                        </div>
+                        
+                        <!-- Art Radar -->
+                        <div id="radar-wrapper-art" class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+                            <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-4">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2"><i data-lucide="radar" class="text-amber-500 w-5 h-5"></i> กราฟเปรียบเทียบผลสัมฤทธิ์รายวิชา</h3>
+                                    <p class="text-[11px] text-slate-500 mt-1 font-semibold">กลุ่ม: <span class="text-amber-600">สายศิลป์ (5 วิชา)</span></p>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded-md uppercase">Close-Scale</span>
+                            </div>
+                            <div class="h-[320px] relative flex-1 flex justify-center w-full"><canvas id="radarChartArt"></canvas></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tab 2: Subject Performance -->
+            <!-- TAB 2: Subjects -->
             <div id="tab2" class="hidden space-y-6">
-                <div id="ring-charts-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                    <!-- Ring charts injected here -->
+                <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-indigo-50/30">
+                    <div class="p-2.5 bg-indigo-100 text-indigo-600 rounded-xl shrink-0"><i data-lucide="info" class="w-6 h-6"></i></div>
+                    <div class="space-y-1">
+                        <p class="text-sm text-slate-700 font-semibold">ระบบสร้างแผนพัฒนาอัตโนมัติ</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">คลิกปุ่ม <b class="text-indigo-700">"TCAS A-Level Blueprint"</b> ใต้การ์ดเพื่อดูข้อสอบย้อนหลัง 5 ปี พร้อมรับคำแนะนำแผนการสอนที่ประมวลผลจากคะแนนปัจจุบันโดยอัตโนมัติ</p>
+                    </div>
+                </div>
+                <div id="ring-charts-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- Ring charts injected -->
                 </div>
             </div>
 
-            <!-- Tab 3: Student List -->
+            <!-- TAB 3: Student List -->
             <div id="tab3" class="hidden space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
-                        <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4 text-brand-600"></i> รายชื่อและผลประเมินรายบุคคล</h3>
-                        <div class="relative w-full sm:w-64">
+                    <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50/80">
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i data-lucide="contact" class="w-5 h-5 text-slate-500"></i> บัญชีรายชื่อและผลคะแนน</h3>
+                        <div class="relative w-full md:w-80">
                             <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4"></i>
-                            <input type="text" id="search-student" onkeyup="filterTable()" placeholder="ค้นหาชื่อ, รหัส..." class="w-full border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm">
+                            <input type="text" id="search-student" onkeyup="renderTable()" placeholder="ค้นหารหัส, ชื่อ, สกุล, ห้อง..." class="w-full border border-slate-300 rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-sm font-medium">
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-slate-100 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                            <thead class="bg-slate-100/50 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
                                 <tr>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('id')">รหัส <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('no')">เลขที่ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('name')">ชื่อ-สกุล <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('stream')">สายการเรียน <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('totalScore')">คะแนนรวม <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('percent')">ร้อยละ (%) <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th class="px-5 py-4 sortable transition-colors" onclick="sortTable('status')">สถานะ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
+                                    <th class="px-5 py-4 sortable group" onclick="sortTable('id')">รหัส <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-300 group-hover:text-brand-500 transition-colors ml-1"></i></th>
+                                    <th class="px-5 py-4 sortable group" onclick="sortTable('room')">ห้อง <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-300 group-hover:text-brand-500 transition-colors ml-1"></i></th>
+                                    <th class="px-5 py-4 sortable group" onclick="sortTable('name')">ชื่อ-สกุล <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-300 group-hover:text-brand-500 transition-colors ml-1"></i></th>
+                                    <th class="px-5 py-4 text-center">สายการเรียน</th>
+                                    <th class="px-5 py-4 sortable group text-center" onclick="sortTable('totalScore')">คะแนนรวม <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-300 group-hover:text-brand-500 transition-colors ml-1"></i></th>
+                                    <th class="px-5 py-4 sortable group text-center" onclick="sortTable('percent')">ร้อยละ (%) <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-300 group-hover:text-brand-500 transition-colors ml-1"></i></th>
+                                    <th id="th-dev" class="px-5 py-4 sortable group text-center bg-amber-50/50 text-amber-700 border-l border-r border-amber-100" onclick="sortTable('diffPercent')">พัฒนาการ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-amber-400 group-hover:text-amber-600 ml-1"></i></th>
+                                    <th class="px-5 py-4 sortable group text-center" onclick="sortTable('status')">สถานะ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-300 group-hover:text-brand-500 transition-colors ml-1"></i></th>
                                     <th class="px-5 py-4 text-right">การจัดการ</th>
                                 </tr>
                             </thead>
-                            <tbody id="student-tbody" class="divide-y divide-slate-100">
-                                <!-- Data injected here -->
+                            <tbody id="student-tbody" class="divide-y divide-slate-100 bg-white">
+                                <!-- Table Data injected here -->
                             </tbody>
                         </table>
                     </div>
@@ -209,20 +254,16 @@
         </div>
     </main>
 
-    <!-- Modals -->
-    
     <!-- Blueprint Modal -->
     <div id="modal-blueprint" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2" id="bp-title">💡 A-Level Blueprint</h3>
-                <button onclick="closeModal('modal-blueprint')" class="text-slate-400 hover:text-slate-700 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-indigo-950 text-white">
+                <h3 class="font-bold text-lg sm:text-xl flex items-center gap-3" id="bp-title">💡 A-Level Blueprint</h3>
+                <button onclick="closeModal('modal-blueprint')" class="text-indigo-200 hover:text-white transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            <div class="p-6 overflow-y-auto custom-scrollbar" id="bp-content">
-                <!-- Content injected -->
-            </div>
-            <div class="p-5 border-t border-slate-100 bg-slate-50 text-right">
-                <button onclick="closeModal('modal-blueprint')" class="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 shadow-sm transition-colors">ปิดหน้าต่าง</button>
+            <div class="p-5 sm:p-6 overflow-y-auto bg-slate-50 flex-1" id="bp-content"></div>
+            <div class="p-4 sm:p-5 border-t border-slate-200 bg-white text-right">
+                <button onclick="closeModal('modal-blueprint')" class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors shadow-sm">ปิดหน้าต่าง</button>
             </div>
         </div>
     </div>
@@ -230,637 +271,652 @@
     <!-- Student Detail Modal -->
     <div id="modal-student" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-gradient-to-r from-slate-50 to-white">
-                <div>
-                    <h3 class="font-bold text-2xl text-slate-800" id="st-name">นาย ทดสอบ ระบบ</h3>
-                    <p class="text-sm text-slate-500 font-medium mt-1.5 flex items-center gap-1.5" id="st-meta"><i data-lucide="user-square" class="w-4 h-4"></i> รหัส: 00000 | สายวิทย์-คณิต</p>
+            <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-900 text-white relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 text-white/5 pointer-events-none"><i data-lucide="graduation-cap" class="w-64 h-64"></i></div>
+                <div class="relative z-10 pr-4">
+                    <span class="px-2.5 py-1 text-[10px] font-bold bg-white/20 rounded-md uppercase tracking-wide mb-2 inline-block" id="st-stream">สายวิทย์-คณิต</span>
+                    <h3 class="font-bold text-xl sm:text-2xl leading-tight" id="st-name">--</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-1.5 font-medium" id="st-meta">--</p>
                 </div>
-                <div class="text-right">
-                    <button onclick="closeModal('modal-student')" class="text-slate-400 hover:text-slate-700 absolute top-4 right-4 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
-                    <!-- Enhanced Score Widget -->
-                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm mt-6 mr-4 flex items-center gap-4">
-                        <div class="text-center">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">คะแนนรวม</p>
-                            <p class="text-xl font-black text-brand-600" id="st-total">0/0</p>
+                <div class="relative z-10 text-right flex flex-col items-end shrink-0">
+                    <button onclick="closeModal('modal-student')" class="text-slate-400 hover:text-white mb-3 sm:mb-4 bg-slate-800 hover:bg-slate-700 p-1.5 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-2.5 sm:p-3 shadow-lg flex items-center gap-3 sm:gap-4 text-left">
+                        <div>
+                            <p class="text-[9px] sm:text-[10px] text-slate-300 font-bold uppercase tracking-wide">คะแนนรวม</p>
+                            <p class="text-base sm:text-lg font-black text-white" id="st-total">0/0</p>
                         </div>
-                        <div class="w-px h-10 bg-slate-200"></div>
-                        <div class="text-center">
-                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">เปอร์เซ็นต์</p>
-                            <p class="text-xl font-black text-emerald-600" id="st-percent">0.00%</p>
+                        <div class="w-px h-6 sm:h-8 bg-white/20"></div>
+                        <div>
+                            <p class="text-[9px] sm:text-[10px] text-slate-300 font-bold uppercase tracking-wide">เฉลี่ย (%)</p>
+                            <p class="text-base sm:text-lg font-black text-amber-400" id="st-percent">0.00%</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="p-6">
-                <h4 class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bar-chart" class="w-4 h-4"></i> สัดส่วนคะแนนรายวิชา (เต็ม 100)</h4>
-                <div class="h-64"><canvas id="studentBarChart"></canvas></div>
+            <div class="p-5 sm:p-6 bg-slate-50">
+                <h4 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-brand-500"></i> คะแนนย่อยรายวิชา (เต็ม 100)</h4>
+                <div class="h-[250px] sm:h-[280px]"><canvas id="studentBarChart"></canvas></div>
             </div>
         </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="modal-settings" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm transition-opacity">
+    <div id="modal-settings" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col">
             <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-slate-500"></i> ตั้งค่าระบบ</h3>
-                <button onclick="closeModal('modal-settings')" class="text-slate-400 hover:text-slate-700 bg-white p-1.5 rounded-lg border border-slate-200 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2"><i data-lucide="settings" class="w-5 h-5 text-slate-500"></i> ตั้งค่าเกณฑ์ประเมิน</h3>
+                <button onclick="closeModal('modal-settings')" class="text-slate-400 hover:text-slate-700"><i data-lucide="x"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">เกณฑ์การผ่าน (ร้อยละ)</label>
-                    <div class="relative">
-                        <input type="number" id="pass-criteria" value="50" class="w-full border border-slate-300 rounded-xl pl-4 pr-10 py-2.5 text-sm font-semibold focus:ring-brand-500 focus:border-brand-500 shadow-sm">
-                        <span class="absolute right-4 top-2.5 text-slate-400 font-medium">%</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-2">นักเรียนที่ได้คะแนนร้อยละเฉลี่ยต่ำกว่าเกณฑ์นี้ จะถูกจัดเป็นกลุ่ม "ควรปรับปรุง"</p>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">เกณฑ์ผ่านขั้นต่ำ (ร้อยละ %)</label>
+                    <input type="number" id="pass-criteria" value="50" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-base font-bold text-slate-800 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 shadow-sm outline-none">
                 </div>
             </div>
             <div class="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-                <button onclick="closeModal('modal-settings')" class="px-5 py-2.5 text-slate-600 hover:bg-slate-200 rounded-xl text-sm font-semibold transition-colors">ยกเลิก</button>
-                <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-700 shadow-sm transition-colors">บันทึกข้อมูล</button>
+                <button onclick="closeModal('modal-settings')" class="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-200 rounded-xl transition-colors">ยกเลิก</button>
+                <button onclick="saveSettings()" class="px-5 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition-colors shadow-md">บันทึก</button>
             </div>
         </div>
     </div>
 
+    <!-- MAIN SCRIPT -->
     <script>
-        // Register ChartDataLabels plugin globally but disable it by default
+        // Setup ChartJS Global
         Chart.register(ChartDataLabels);
-        Chart.defaults.plugins.datalabels = { display: false }; // We'll turn it on specifically for Radar & Bar charts
+        Chart.defaults.plugins.datalabels = { display: false };
+        Chart.defaults.font.family = "'Sarabun', 'Inter', sans-serif";
 
-        // --- 1. CONFIG & STATE ---
+        // Subject Dict & TCAS Blueprint Data
         const SUBJECTS = {
-            'math': { name: 'คณิตศาสตร์', keys: ['รวมคณิต', 'คณิต'], emoji: '📐', color: '#3b82f6' },
-            'thai': { name: 'ภาษาไทย', keys: ['ภาษาไทย', 'ไทย'], emoji: '🇹🇭', color: '#f59e0b' },
-            'social': { name: 'สังคมศึกษา', keys: ['สังคม', 'สังคมศึกษา'], emoji: '🌍', color: '#10b981' },
-            'eng': { name: 'ภาษาอังกฤษ', keys: ['ภาษาอังกฤษ', 'อังกฤษ'], emoji: '🗣️', color: '#ec4899' },
-            'physics': { name: 'ฟิสิกส์', keys: ['รวมฟิสิกส์', 'ฟิสิกส์'], emoji: '⚛️', color: '#8b5cf6', stream: 'science' },
-            'chem': { name: 'เคมี', keys: ['เคมี'], emoji: '🧪', color: '#06b6d4', stream: 'science' },
-            'bio': { name: 'ชีววิทยา', keys: ['รวมชีวะ', 'ชีวะ'], emoji: '🧬', color: '#84cc16', stream: 'science' },
-            'sci': { name: 'วิทยาศาสตร์', keys: ['วิทย์', 'วิทยาศาสตร์ทั่วไป'], emoji: '🔭', color: '#0ea5e9', stream: 'art' }
+            'math': { name: 'คณิตศาสตร์', color: '#3b82f6', emoji: '📐', bp: 'เซต, ตรรกศาสตร์, จำนวนจริง, ความสัมพันธ์และฟังก์ชัน, แคลคูลัสเบื้องต้น, สถิติและการแจกแจงความน่าจะเป็น' },
+            'thai': { name: 'ภาษาไทย', color: '#f59e0b', emoji: '🇹🇭', bp: 'การอ่านจับใจความ, การตีความ, การอนุมาน, หลักการใช้ภาษา, ระดับภาษา, ราชาศัพท์, การร้อยเรียงประโยค' },
+            'social': { name: 'สังคมศึกษา', color: '#10b981', emoji: '🌍', bp: 'ศาสนาศีลธรรม, หน้าที่พลเมืองและกฎหมาย, เศรษฐศาสตร์ (กลไกราคา), ประวัติศาสตร์, ภูมิศาสตร์และภัยพิบัติ' },
+            'eng': { name: 'ภาษาอังกฤษ', color: '#ec4899', emoji: '🗣️', bp: 'Listening & Speaking, Reading Comprehension (Ads, News, Articles), Grammar & Vocab, Cloze Test' },
+            'physics': { name: 'ฟิสิกส์', color: '#8b5cf6', stream: 'science', emoji: '⚛️', bp: 'กลศาสตร์, สมดุลกล, งานพลังงาน, คลื่น (แสง/เสียง), ไฟฟ้าและแม่เหล็ก, อุณหพลศาสตร์, ฟิสิกส์นิวเคลียร์' },
+            'chem': { name: 'เคมี', color: '#06b6d4', stream: 'science', emoji: '🧪', bp: 'โครงสร้างอะตอม, พันธะเคมี, ปริมาณสารสัมพันธ์, แก๊ส, อัตราปฏิกิริยา, กรด-เบส, เคมีไฟฟ้า, เคมีอินทรีย์' },
+            'bio': { name: 'ชีววิทยา', color: '#84cc16', stream: 'science', emoji: '🧬', bp: 'เซลล์และการทำงาน, ระบบร่างกาย (ย่อย/หมุนเวียน/ภูมิคุ้มกัน/ประสาท), พันธุศาสตร์, วิวัฒนาการ, นิเวศวิทยา' },
+            'sci': { name: 'วิทยาศาสตร์', color: '#0ea5e9', stream: 'art', emoji: '🔭', bp: 'วิทย์ชีวภาพ (ระบบนิเวศ), วิทย์กายภาพ (สสาร/แรง), วิทย์โลกและอวกาศ (โครงสร้างโลก/ระบบสุริยะ)' }
         };
 
-        let rawStudents = [];
+        // Unified Student State map
+        let unifiedStudents = new Map();
+        
         let state = {
             filter: 'all', // 'all', 'science', 'art'
+            round: 'compare', // 'r1', 'r2', 'compare'
             passCriteria: 50,
-            sortCol: 'percent',
-            sortAsc: false
+            sortCol: 'id',
+            sortAsc: true
         };
-
         let charts = {};
 
-        // Fallback Data
-        const demoDataScience = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,,คณิต,รวมคณิต,ชีวะ,,รวมชีวะ,ฟิสิกส์,,รวมฟิสิกส์,ไทย,สังคม,เคมี,ภาษาอังกฤษ
-29141,1,นางสาววิภาดา,โก,15,0,15,12,7.47,19.47,15,,,40,18,15,53
-29168,2,นางสาวจรัสวดี,บัวตูม,12,0,12,17,8.54,25.54,6,,,42,32,23,35
-29177,3,นางสาวนิจจารีย์,แซ่ย่าง,15,0,15,26,10.67,36.67,15,,,26,26,23,31
-29180,4,นางสาวปริยากร,ชัยกาวิล,36,0,36,17,10.67,27.67,15,,,32,40,25,31
-29202,5,นางสาวณัฎฐณิชา,ปัญญา,15,0,15,19,8.54,27.54,6,,,28,40,18,38
-29482,22,(ขาด)นางสาวพิมพ์วิภา,ขันคำ,0,,0,0,,0,0,,,0,0,0,0
-29460,18,นายรัฐศาสตร์,เครือแก้ว,9,0,9,10,7.47,17.47,21,,,36,28,18,41`;
-
-        const demoDataArt = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,,รวมคณิต,ภาษาไทย,สังคม,ภาษาอังกฤษ,วิทย์,
-29119,1,นฤภัทร,ปวนลุน,12,,12,28,32,59,26,11.2
-29139,2,นางสาวฟ้าใส,ไชยวรรณ์,30,,30,42,26,44,26,8.4
-29140,3,นางสาวภวิษย์พร,เด่นดวงเดือน,27,,27,48,28,71,29,12.6
-29146,4,(ขาด)นางสาวอภิชญา,หลอโตน,0,,0,0,0,0,0,
-29147,5,นายกชกร,จินะคำปา,30,5,35,52,36,34,38,9.8`;
-
-        // --- 2. DATA PROCESSING ---
+        // MAIN ENTRY: Load Excel Files via Fetch API
         async function loadData() {
             lucide.createIcons();
             const statusEl = document.getElementById('data-status');
             
             try {
-                const response = await fetch('สายวิทย์_2.xlsx');
-                if (!response.ok) throw new Error('File not found');
-                const arrayBuffer = await response.arrayBuffer();
-                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                // Fetching ALL 4 files as specified
+                const [resR1, resR2Info, resR2Sci, resR2Art] = await Promise.all([
+                    fetch('(รอบ 1) ช้อมูลและคะแนน.xlsx').catch(() => null),
+                    fetch('(รอบ 2) ข้อมูล.xlsx').catch(() => null),
+                    fetch('(รอบ 2) สายวิทย์.xlsx').catch(() => null),
+                    fetch('(รอบ 2) สายศิลป์.xlsx').catch(() => null)
+                ]);
+
+                // Check if R1 fetched successfully to proceed
+                if (!resR1 || !resR1.ok) {
+                    throw new Error('ไม่พบไฟล์ Excel');
+                }
+
+                // Process R1 (Has both Sci and Art sheets)
+                const wbR1 = XLSX.read(await resR1.arrayBuffer(), { type: 'array' });
+                const r1SheetNames = wbR1.SheetNames;
+                if(r1SheetNames.length >= 1) processScores(XLSX.utils.sheet_to_json(wbR1.Sheets[r1SheetNames[0]], { defval: "" }), 'science', 'r1');
+                if(r1SheetNames.length >= 2) processScores(XLSX.utils.sheet_to_json(wbR1.Sheets[r1SheetNames[1]], { defval: "" }), 'art', 'r1');
+
+                // Process R2 Room Info
+                if (resR2Info && resR2Info.ok) {
+                    const wbR2Info = XLSX.read(await resR2Info.arrayBuffer(), { type: 'array' });
+                    const r2InfoData = XLSX.utils.sheet_to_json(wbR2Info.Sheets[wbR2Info.SheetNames[0]], { defval: "" });
+                    r2InfoData.forEach(row => {
+                        let id = findValueByKeyword(row, ['รหัส']);
+                        let room = findValueByKeyword(row, ['ชั้น', 'ห้อง']);
+                        if (id && unifiedStudents.has(String(id).trim())) {
+                            unifiedStudents.get(String(id).trim()).room = room;
+                        }
+                    });
+                }
+
+                // Process R2 Scores
+                if (resR2Sci && resR2Sci.ok) {
+                    const wbR2Sci = XLSX.read(await resR2Sci.arrayBuffer(), { type: 'array' });
+                    processScores(XLSX.utils.sheet_to_json(wbR2Sci.Sheets[wbR2Sci.SheetNames[0]], { defval: "" }), 'science', 'r2');
+                }
                 
-                rawStudents = [];
-                workbook.SheetNames.forEach(sheetName => {
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
-                    processRawJSON(json);
-                });
-                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3 h-3"></i> โหลดข้อมูลจากไฟล์สำเร็จ';
-                statusEl.className = 'px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm border border-emerald-200';
-                
+                if (resR2Art && resR2Art.ok) {
+                    const wbR2Art = XLSX.read(await resR2Art.arrayBuffer(), { type: 'array' });
+                    processScores(XLSX.utils.sheet_to_json(wbR2Art.Sheets[wbR2Art.SheetNames[0]], { defval: "" }), 'art', 'r2');
+                }
+
+                // Success visual
+                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ดึงฐานข้อมูล 4 ไฟล์สำเร็จ';
+                statusEl.className = 'px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-emerald-200 shadow-sm';
+
             } catch (error) {
-                console.warn("File not found, using Fallback Demo Data", error);
-                processRawJSON(Papa.parse(demoDataScience, { header: true }).data);
-                processRawJSON(Papa.parse(demoDataArt, { header: true }).data);
-                
-                statusEl.innerHTML = '<i data-lucide="info" class="w-3 h-3"></i> ใช้ข้อมูล Demo';
-                statusEl.className = 'px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm border border-blue-200';
+                // Fallback Error Display - Using Demo Data
+                console.warn("ไม่พบไฟล์ Excel ระบบกำลังโหลดข้อมูลจำลอง (Demo Data) เพื่อแสดงตัวอย่าง");
+                statusEl.innerHTML = '<i data-lucide="info" class="w-3.5 h-3.5"></i> แสดงข้อมูลจำลอง (Demo Data)';
+                statusEl.className = 'px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-blue-200 shadow-sm';
+                loadDemoData();
             }
             
-            lucide.createIcons();
+            // Generate empty structs for students lacking data in either round to prevent crashes
+            for (let [id, student] of unifiedStudents.entries()) {
+                if (!student.r1) student.r1 = createEmptyScoreObj(student.stream);
+                if (!student.r2) student.r2 = createEmptyScoreObj(student.stream);
+            }
+
             applyFilterAndRender();
         }
 
-        function processRawJSON(data) {
-            if (!data || data.length === 0) return;
-            
-            const headers = Object.keys(data[0]);
-            const isScience = headers.some(h => h.includes('ฟิสิกส์') || h.includes('ชีวะ'));
-            const streamStr = isScience ? 'science' : 'art';
-            const maxSubjects = isScience ? 7 : 5;
+        function loadDemoData() {
+            const demoStudents = [
+                { id: '29141', name: 'นางสาววิภาดา โก', room: '6/1', stream: 'science',
+                  r1: { scores: { math: 30, phys: 40, chem: 50, bio: 45, thai: 60, social: 55, eng: 65 }, totalScore: 345, maxScore: 700, percent: 49.28, isMissing: false },
+                  r2: { scores: { math: 45, phys: 55, chem: 58, bio: 59, thai: 70, social: 60, eng: 73 }, totalScore: 420, maxScore: 700, percent: 60.00, isMissing: false } },
+                { id: '29168', name: 'นางสาวจรัสวดี บัวตูม', room: '6/1', stream: 'science',
+                  r1: { scores: { math: 50, phys: 60, chem: 65, bio: 60, thai: 75, social: 70, eng: 80 }, totalScore: 460, maxScore: 700, percent: 65.71, isMissing: false },
+                  r2: { scores: { math: 45, phys: 55, chem: 60, bio: 58, thai: 70, social: 65, eng: 75 }, totalScore: 428, maxScore: 700, percent: 61.14, isMissing: false } },
+                { id: '29119', name: 'นฤภัทร ปวนลุน', room: '6/5', stream: 'art',
+                  r1: { scores: { math: 20, thai: 40, social: 45, eng: 50, sci: 30 }, totalScore: 185, maxScore: 500, percent: 37.00, isMissing: false },
+                  r2: { scores: { math: 35, thai: 55, social: 60, eng: 65, sci: 45 }, totalScore: 260, maxScore: 500, percent: 52.00, isMissing: false } },
+                { id: '29139', name: 'นางสาวฟ้าใส ไชยวรรณ์', room: '6/5', stream: 'art',
+                  r1: { scores: { math: 0, thai: 0, social: 0, eng: 0, sci: 0 }, totalScore: 0, maxScore: 500, percent: 0, isMissing: true },
+                  r2: { scores: { math: 40, thai: 65, social: 55, eng: 60, sci: 50 }, totalScore: 270, maxScore: 500, percent: 54.00, isMissing: false } }
+            ];
 
-            data.forEach(row => {
-                let cleanRow = {};
-                for(let k in row) cleanRow[k.trim()] = row[k];
-                
-                if (!cleanRow['รหัสผู้สอบ'] && !cleanRow['ชื่อ']) return;
-
-                let student = {
-                    id: cleanRow['รหัสผู้สอบ'],
-                    no: parseInt(cleanRow['เลขที่']) || 999,
-                    name: `${cleanRow['ชื่อ'] || ''} ${cleanRow['สกุล'] || ''}`.trim(),
-                    stream: streamStr,
-                    streamName: isScience ? 'สายวิทย์-คณิต' : 'สายศิลป์',
-                    scores: {},
-                    totalScore: 0,
-                    maxScore: maxSubjects * 100,
-                    isMissing: false
-                };
-
-                if(student.name.includes('(ขาด)')) {
-                    student.name = student.name.replace('(ขาด)', '').trim();
-                }
-
-                let sum = 0;
-                let hasAnyScore = false;
-
-                Object.entries(SUBJECTS).forEach(([subjKey, subjDef]) => {
-                    if (subjDef.stream && subjDef.stream !== streamStr) return; 
-
-                    let val = null;
-                    for (let keyToFind of subjDef.keys) {
-                        if (cleanRow[keyToFind] !== undefined && cleanRow[keyToFind] !== "") {
-                            val = parseFloat(cleanRow[keyToFind]) || 0;
-                            break; 
-                        }
-                    }
-                    
-                    if (val !== null) {
-                        student.scores[subjKey] = val;
-                        sum += val;
-                        if (val > 0) hasAnyScore = true;
-                    } else {
-                         student.scores[subjKey] = 0; 
-                    }
+            demoStudents.forEach(s => {
+                unifiedStudents.set(s.id, {
+                    id: s.id, name: s.name, room: s.room, stream: s.stream,
+                    streamName: s.stream === 'science' ? 'สายวิทย์-คณิต' : 'สายศิลป์',
+                    r1: s.r1, r2: s.r2
                 });
-
-                student.totalScore = sum;
-                student.percent = (sum / student.maxScore) * 100;
-                student.isMissing = !hasAnyScore;
-
-                rawStudents.push(student);
             });
         }
 
-        // --- 3. FILTERING & RENDER ENGINE ---
+        // --- Helper: Find Column Key by Substring ---
+        // Ex: findKeyByKeywords(row, ['รวมคณิต']) will find a header like "คะแนนรวมคณิต 100"
+        function findKeyByKeywords(row, keywords) {
+            return Object.keys(row).find(k => keywords.some(kw => String(k).includes(kw)));
+        }
+        function findValueByKeyword(row, keywords) {
+            let key = findKeyByKeywords(row, keywords);
+            return key ? row[key] : null;
+        }
+
+        // Initialize empty structure
+        function createEmptyScoreObj(stream) {
+            let obj = { scores: {}, totalScore: 0, maxScore: (stream === 'science' ? 700 : 500), isMissing: true, percent: 0 };
+            Object.keys(SUBJECTS).forEach(k => {
+                if (!SUBJECTS[k].stream || SUBJECTS[k].stream === stream) obj.scores[k] = 0;
+            });
+            return obj;
+        }
+
+        // Get or Create Unified Student Profile
+        function getOrCreateStudent(id, name, stream) {
+            let key = String(id).trim();
+            if (!unifiedStudents.has(key)) {
+                unifiedStudents.set(key, {
+                    id: key,
+                    name: String(name).replace('(ขาด)', '').trim(),
+                    room: '-',
+                    stream: stream,
+                    streamName: stream === 'science' ? 'สายวิทย์-คณิต' : 'สายศิลป์',
+                    r1: null,
+                    r2: null
+                });
+            }
+            return unifiedStudents.get(key);
+        }
+
+        // Smart Extractor for both R1 and R2 mapping rules
+        function processScores(data, stream, roundStr) {
+            if (!data || data.length === 0) return;
+            
+            data.forEach(row => {
+                let id = findValueByKeyword(row, ['รหัส']);
+                let name = findValueByKeyword(row, ['ชื่อ']);
+                let surname = findValueByKeyword(row, ['สกุล']) || '';
+                if (!id || !name || String(id).includes('รหัส')) return; // Skip headers/empty
+
+                let fullName = `${name} ${surname}`.trim();
+                let student = getOrCreateStudent(id, fullName, stream);
+                
+                let scoreObj = { scores: {}, totalScore: 0, maxScore: (stream === 'science' ? 700 : 500), isMissing: false, percent: 0 };
+                let sum = 0; 
+                let hasAnyScore = false;
+                
+                // Helper to fetch score (Prioritize "รวม" prefix if provided)
+                const getScore = (primaryKey, secondaryKey) => {
+                    let vPrimary = findValueByKeyword(row, [primaryKey]);
+                    let parsedPrimary = parseFloat(vPrimary);
+                    if (!isNaN(parsedPrimary) && parsedPrimary > 0) return parsedPrimary; // Return if valid > 0
+
+                    let vSecondary = findValueByKeyword(row, [secondaryKey]);
+                    let parsedSecondary = parseFloat(vSecondary);
+                    return isNaN(parsedSecondary) ? 0 : parsedSecondary;
+                };
+
+                Object.entries(SUBJECTS).forEach(([subjKey, subjDef]) => {
+                    if (subjDef.stream && subjDef.stream !== stream) return;
+                    
+                    let val = 0;
+                    if (subjKey === 'math') val = getScore('รวมคณิต', 'คณิต');
+                    else if (subjKey === 'physics') val = getScore('รวมฟิสิกส์', 'ฟิสิกส์');
+                    else if (subjKey === 'bio') val = getScore('รวมชีวะ', 'ชีวะ');
+                    else if (subjKey === 'chem') val = getScore('เคมี', 'เคมี');
+                    else if (subjKey === 'thai') val = getScore('ไทย', 'ไทย');
+                    else if (subjKey === 'social') val = getScore('สังคม', 'สังคม');
+                    else if (subjKey === 'eng') val = getScore('อังกฤษ', 'อังกฤษ');
+                    else if (subjKey === 'sci') val = getScore('วิทย์', 'วิทย์');
+
+                    scoreObj.scores[subjKey] = val;
+                    sum += val;
+                    if (val > 0) hasAnyScore = true;
+                });
+
+                scoreObj.totalScore = sum;
+                scoreObj.percent = (sum / scoreObj.maxScore) * 100;
+                // If name contains "(ขาด)" or sum is 0
+                if (fullName.includes('(ขาด)') || !hasAnyScore) {
+                    scoreObj.isMissing = true;
+                    scoreObj.totalScore = 0;
+                    scoreObj.percent = 0;
+                }
+
+                student[roundStr] = scoreObj;
+            });
+        }
+
+        // --- UI FILTER CONTROLS ---
         function setFilter(type) {
             state.filter = type;
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('active', 'bg-brand-600', 'text-white');
-                b.classList.add('text-slate-600', 'bg-white');
-            });
-            
-            let activeBtn = type === 'all' ? 'btn-filter-all' : type === 'science' ? 'btn-filter-sci' : 'btn-filter-art';
-            let btn = document.getElementById(activeBtn);
-            btn.classList.add('active', 'bg-brand-600', 'text-white');
-            btn.classList.remove('text-slate-600', 'bg-white');
+            document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active', 'bg-white', 'text-brand-600', 'shadow-sm'); b.classList.add('text-slate-600'); });
+            let btn = document.getElementById(type === 'all' ? 'btn-filter-all' : type === 'science' ? 'btn-filter-sci' : 'btn-filter-art');
+            btn.classList.add('active', 'bg-white', 'text-brand-600', 'shadow-sm'); btn.classList.remove('text-slate-600');
+            applyFilterAndRender();
+        }
 
+        function setRound(round) {
+            state.round = round;
+            document.querySelectorAll('.round-btn').forEach(b => { b.classList.remove('active', 'bg-brand-600', 'text-white'); b.classList.add('text-slate-600', 'hover:bg-white'); });
+            document.querySelectorAll('.round-btn-compare').forEach(b => b.classList.remove('active', 'bg-white', 'shadow-sm'));
+            
+            if (round === 'compare') {
+                document.getElementById('btn-round-compare').classList.add('active', 'bg-white', 'shadow-sm');
+                document.getElementById('th-dev').classList.remove('hidden');
+            } else {
+                let btn = document.getElementById(round === 'r1' ? 'btn-round-r1' : 'btn-round-r2');
+                btn.classList.add('active', 'bg-brand-600', 'text-white'); btn.classList.remove('text-slate-600', 'hover:bg-white');
+                document.getElementById('th-dev').classList.add('hidden');
+            }
             applyFilterAndRender();
         }
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('active', 'border-brand-600', 'text-brand-900');
-                b.classList.add('border-transparent');
-            });
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'border-brand-600', 'text-brand-900'));
             document.querySelectorAll('[id^="tab"]').forEach(t => t.classList.add('hidden'));
-            
             document.getElementById(tabId).classList.remove('hidden');
-            let btnId = 'btn-' + tabId;
-            let btn = document.getElementById(btnId);
-            btn.classList.add('active', 'border-brand-600', 'text-brand-900');
-            btn.classList.remove('border-transparent');
+            document.getElementById('btn-' + tabId).classList.add('active', 'border-brand-600', 'text-brand-900');
         }
 
-        function getFilteredStudents() {
-            if (state.filter === 'all') return rawStudents;
-            return rawStudents.filter(s => s.stream === state.filter);
-        }
+        // Core Data Extraction depending on View Mode
+        function getActiveStudents() {
+            let list = Array.from(unifiedStudents.values());
+            if (state.filter !== 'all') list = list.filter(s => s.stream === state.filter);
 
-        function calculateNonZeroMean(students, subjectKey) {
-            let validScores = [];
-            students.forEach(s => {
-                if (s.isMissing) return;
-                if (s.scores[subjectKey] !== undefined && s.scores[subjectKey] > 0) {
-                    validScores.push(s.scores[subjectKey]);
+            let processed = [];
+            list.forEach(m => {
+                if (state.round === 'r1' && m.r1) {
+                    processed.push({ ...m, ...m.r1, base: m });
+                } else if (state.round === 'r2' && m.r2) {
+                    processed.push({ ...m, ...m.r2, base: m });
+                } else if (state.round === 'compare') {
+                    // Compare mode base display is R2. Attach R1 reference.
+                    let isMissingBoth = m.r1.isMissing && m.r2.isMissing;
+                    if (!isMissingBoth) {
+                        let diffPct = 0;
+                        if (!m.r1.isMissing && !m.r2.isMissing) diffPct = m.r2.percent - m.r1.percent;
+                        
+                        processed.push({ 
+                            ...m, 
+                            ...m.r2, // Base display data
+                            r1Ref: m.r1, 
+                            diffPercent: diffPct,
+                            validCompare: (!m.r1.isMissing && !m.r2.isMissing),
+                            base: m 
+                        }); 
+                    }
                 }
             });
-            if (validScores.length === 0) return 0;
-            let sum = validScores.reduce((a, b) => a + b, 0);
-            return sum / validScores.length; 
+            return processed;
         }
 
+        function calculateNonZeroMean(students, subjectKey, sourceKey = 'scores') {
+            let valid = [];
+            students.forEach(s => {
+                let src = sourceKey === 'r1Ref' ? (s.r1Ref ? s.r1Ref.scores : {}) : s.scores;
+                let isMissing = sourceKey === 'r1Ref' ? (s.r1Ref ? s.r1Ref.isMissing : true) : s.isMissing;
+                if (!isMissing && src[subjectKey] > 0) valid.push(src[subjectKey]);
+            });
+            if (valid.length === 0) return 0;
+            return valid.reduce((a, b) => a + b, 0) / valid.length;
+        }
+
+        // --- RENDER ENGINE ---
         function applyFilterAndRender() {
-            const students = getFilteredStudents();
-            
-            // 1. Render KPIs
+            const students = getActiveStudents();
             const validStudents = students.filter(s => !s.isMissing);
-            document.getElementById('kpi-count').innerText = `${validStudents.length} คน`;
             
-            let totalAvgPercent = 0;
-            if (validStudents.length > 0) {
-                 totalAvgPercent = validStudents.reduce((a, b) => a + b.percent, 0) / validStudents.length;
-            }
+            // 1. Update KPIs
+            document.getElementById('kpi-count').innerText = validStudents.length;
+            
+            let totalAvgPercent = validStudents.length > 0 ? validStudents.reduce((a, b) => a + b.percent, 0) / validStudents.length : 0;
             document.getElementById('kpi-avg').innerText = totalAvgPercent.toFixed(2) + '%';
 
-            let minAvg = 100;
-            let weakSubj = '-';
+            let diffEl = document.getElementById('kpi-avg-diff');
+            if (state.round === 'compare') {
+                let compareValid = students.filter(s => s.validCompare);
+                if (compareValid.length > 0) {
+                    let r1Avg = compareValid.reduce((a, b) => a + b.r1Ref.percent, 0) / compareValid.length;
+                    let r2Avg = compareValid.reduce((a, b) => a + b.percent, 0) / compareValid.length;
+                    let diff = r2Avg - r1Avg;
+                    
+                    diffEl.classList.remove('hidden');
+                    diffEl.className = `text-sm font-black mb-1 ${diff > 0 ? 'text-emerald-200' : diff < 0 ? 'text-rose-200' : 'text-slate-200'}`;
+                    diffEl.innerText = diff > 0 ? `▲ +${diff.toFixed(2)}%` : diff < 0 ? `▼ ${diff.toFixed(2)}%` : `คงเดิม 0%`;
+                } else {
+                    diffEl.classList.add('hidden');
+                }
+            } else {
+                diffEl.classList.add('hidden');
+            }
+
+            let minAvg = 100; let weakSubj = '-';
             Object.keys(SUBJECTS).forEach(key => {
                 if (state.filter !== 'all' && SUBJECTS[key].stream && SUBJECTS[key].stream !== state.filter) return;
                 let avg = calculateNonZeroMean(students, key);
-                if (avg > 0 && avg < minAvg) {
-                    minAvg = avg;
-                    weakSubj = SUBJECTS[key].name;
-                }
+                if (avg > 0 && avg < minAvg) { minAvg = avg; weakSubj = SUBJECTS[key].name; }
             });
             document.getElementById('kpi-weakest').innerText = minAvg < 100 ? `${weakSubj} (${minAvg.toFixed(1)}%)` : '-';
 
-            // 2. Render Strategic Summary
-            renderExecutiveBriefTab1(students);
+            // Generate Strategic Brief
+            renderStrategyBrief(students, weakSubj, minAvg);
 
-            // 3. Render Charts
-            renderCoreBarChart();
-            renderRadarCharts();
-            renderSubjectRings();
-
-            // 4. Render Table
-            renderTable();
+            // Render ChartJS
+            renderCharts(students);
+            renderSubjectRings(students);
+            
+            // Render Table
+            renderTable(students);
         }
 
-        // Generate Dynamic Strategic Summary (Tab 1)
-        function renderExecutiveBriefTab1(students) {
-            const container = document.getElementById('dynamic-strategy-content');
-            if (students.length === 0) {
-                container.innerHTML = '<p class="text-slate-300">ไม่มีข้อมูลเพียงพอสำหรับการวิเคราะห์</p>';
-                return;
-            }
+        // Automatic Text Strategy Generator
+        function renderStrategyBrief(students, weakSubj, weakAvg) {
+            const container = document.getElementById('strategy-brief-container');
+            if (students.filter(s => !s.isMissing).length === 0) { container.innerHTML = '<p class="text-slate-400">รอรับข้อมูลการสอบเพื่อวิเคราะห์...</p>'; return; }
 
-            let subjAverages = [];
+            let strengths = [];
             Object.keys(SUBJECTS).forEach(key => {
                 if (state.filter !== 'all' && SUBJECTS[key].stream && SUBJECTS[key].stream !== state.filter) return;
                 let avg = calculateNonZeroMean(students, key);
-                if (avg > 0) subjAverages.push({ key: key, name: SUBJECTS[key].name, avg: avg });
+                if (avg > 0) strengths.push({name: SUBJECTS[key].name, avg: avg});
             });
+            strengths.sort((a,b) => b.avg - a.avg);
+            let top = strengths.length > 0 ? strengths[0] : {name: '-', avg: 0};
 
-            if (subjAverages.length < 2) {
-                container.innerHTML = '<p class="text-slate-300">ไม่มีข้อมูลผลสอบเพียงพอในมุมมองนี้</p>';
-                return;
+            let compareHtml = '';
+            if (state.round === 'compare') {
+                let diffText = document.getElementById('kpi-avg-diff').innerText;
+                let isUp = diffText.includes('▲');
+                compareHtml = `
+                    <div class="${isUp ? 'bg-emerald-900/40 border-emerald-500/30' : 'bg-amber-900/40 border-amber-500/30'} p-4 rounded-xl border flex gap-3 mt-2">
+                        <div class="${isUp ? 'bg-emerald-500/20' : 'bg-amber-500/20'} p-2 rounded-lg h-fit"><i data-lucide="git-compare" class="${isUp ? 'text-emerald-400' : 'text-amber-400'} w-5 h-5"></i></div>
+                        <div>
+                            <p class="font-bold ${isUp ? 'text-emerald-300' : 'text-amber-300'} text-sm">การเติบโตเชิงเปรียบเทียบ (Longitudinal Trend)</p>
+                            <p class="text-xs text-slate-300 mt-1">คะแนนร้อยละเฉลี่ย ${isUp ? '<span class="text-emerald-400 font-bold">ปรับตัวเพิ่มขึ้น</span> สะท้อนถึงแผนการสอนที่ตรงจุดและผู้เรียนมีความเข้าใจเนื้อหาเชิงลึกมากขึ้น' : '<span class="text-amber-400 font-bold">ลดลง/ทรงตัว</span> ควรตรวจสอบระดับความซับซ้อนของข้อสอบและทบทวนเนื้อหาบทเก่าเร่งด่วน'}</p>
+                        </div>
+                    </div>`;
             }
 
-            subjAverages.sort((a, b) => b.avg - a.avg);
-            let topSubj = subjAverages[0];
-            let weakSubj = subjAverages[subjAverages.length - 1];
-
-            let html = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                    <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
-                        <p class="font-bold text-emerald-300 flex items-center gap-2 mb-2 text-sm uppercase tracking-wider"><i data-lucide="trending-up" class="w-4 h-4"></i> จุดแข็ง (Strengths)</p>
-                        <p class="text-sm leading-relaxed text-slate-200">ผลสัมฤทธิ์โดดเด่นในวิชา <b>${topSubj.name} (${topSubj.avg.toFixed(1)}%)</b> แสดงถึงศักยภาพพื้นฐานที่ดีเยี่ยม ควรต่อยอดด้วยโจทย์ประยุกต์ระดับสูง (Advanced Application) ในคาบเรียนเพื่อผลักดันคะแนนสู่ระดับ Top ของประเทศ</p>
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 relative z-10">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10 flex gap-3 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                        <div class="bg-emerald-500/20 p-2 rounded-lg h-fit"><i data-lucide="trending-up" class="text-emerald-400 w-5 h-5"></i></div>
+                        <div><p class="font-bold text-emerald-300 text-sm">จุดเด่นที่ควรต่อยอด (Strengths)</p><p class="text-xs text-slate-300 mt-1">ร้อยละสัมฤทธิ์วิชา <b>${top.name} (${top.avg.toFixed(1)}%)</b> เป็นฐานคะแนนสำคัญ แนะนำให้ฝึกทำโจทย์ Unseen ระดับประยุกต์</p></div>
                     </div>
-                    <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
-                        <p class="font-bold text-rose-300 flex items-center gap-2 mb-2 text-sm uppercase tracking-wider"><i data-lucide="trending-down" class="w-4 h-4"></i> จุดวิกฤต (Critical Areas)</p>
-                        <p class="text-sm leading-relaxed text-slate-200">วิชา <b>${weakSubj.name} (${weakSubj.avg.toFixed(1)}%)</b> เป็นปัจจัยเสี่ยงหลักที่ฉุดรั้งค่าเฉลี่ยรวม จำเป็นต้องปรับยุทธศาสตร์การสอนด่วน โดยเน้นปูพื้นฐานแนวคิดหลัก (Core Concepts) ใหม่ และลดทอนความซับซ้อนของโจทย์ในช่วงแรก</p>
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/10 flex gap-3 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                        <div class="bg-rose-500/20 p-2 rounded-lg h-fit"><i data-lucide="trending-down" class="text-rose-400 w-5 h-5"></i></div>
+                        <div><p class="font-bold text-rose-300 text-sm">จุดอ่อนวิกฤต (Critical Areas)</p><p class="text-xs text-slate-300 mt-1">วิชา <b>${weakSubj} (${weakAvg.toFixed(1)}%)</b> ถือเป็นตัวฉุดค่าเฉลี่ย เสนอจัด Bootcamp ระยะสั้น เน้นจุด High Yield เท่านั้น</p></div>
                     </div>
-                </div>
-                <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm mt-4">
-                     <p class="font-bold text-amber-300 flex items-center gap-2 mb-3 text-sm uppercase tracking-wider"><i data-lucide="target" class="w-4 h-4"></i> แผนปฏิบัติการระยะสั้น (Actionable Plan)</p>
-                     <ul class="list-disc pl-5 space-y-2 text-sm text-slate-200">
-                        <li><b>Targeted Bootcamps:</b> จัดกิจกรรมติวเข้ม 1-2 วัน โดยโฟกัสเฉพาะเนื้อหาที่ออกสอบบ่อย (High Yield) ของวิชา <b>${weakSubj.name}</b> ตามโครงสร้าง A-Level</li>
-                        <li><b>Differentiated Instruction:</b> แบ่งกลุ่มนักเรียนตามผลประเมิน เพื่อจัดการสอนซ่อมเสริมวิชา <b>${weakSubj.name}</b> ให้กลุ่มวิกฤต และมอบหมายโจทย์ท้าทายวิชา <b>${topSubj.name}</b> ให้กลุ่มหัวกะทิ</li>
-                        <li><b>Mock Exams:</b> ใช้ชุดข้อสอบเก่าจริงย้อนหลัง 3 ปี จับเวลาสอบในสภาพแวดล้อมเสมือนจริงเพื่อสร้างความคุ้นชิน</li>
-                     </ul>
+                    ${compareHtml ? `<div class="md:col-span-2">${compareHtml}</div>` : ''}
                 </div>
             `;
-            container.innerHTML = html;
             lucide.createIcons();
         }
 
-        // --- 4. CHARTS (Chart.js) ---
-        function renderCoreBarChart() {
-            const ctx = document.getElementById('coreBarChart').getContext('2d');
+        function renderCharts(students) {
+            // Core Bar Chart (4 Subjects)
+            const ctxBar = document.getElementById('coreBarChart').getContext('2d');
             if (charts.bar) charts.bar.destroy();
 
-            const coreSubjects = ['math', 'thai', 'social', 'eng'];
-            const sciStudents = rawStudents.filter(s => s.stream === 'science');
-            const artStudents = rawStudents.filter(s => s.stream === 'art');
+            const coreSubj = ['math', 'thai', 'social', 'eng'];
+            const sciStudents = students.filter(s => s.stream === 'science');
+            const artStudents = students.filter(s => s.stream === 'art');
 
-            const sciAverages = coreSubjects.map(key => calculateNonZeroMean(sciStudents, key));
-            const artAverages = coreSubjects.map(key => calculateNonZeroMean(artStudents, key));
+            let datasets = []; let allVals = [];
 
-            let datasets = [];
-            let allPlottedValues = [];
-            
-            if (state.filter === 'all' || state.filter === 'science') {
-                datasets.push({
-                    label: 'สายวิทย์-คณิต',
-                    data: sciAverages,
-                    backgroundColor: 'rgba(59, 130, 246, 0.9)', 
-                    borderRadius: 6
-                });
-                allPlottedValues.push(...sciAverages);
+            if (state.round === 'compare') {
+                if (state.filter === 'all' || state.filter === 'science') {
+                    let r1 = coreSubj.map(k => calculateNonZeroMean(sciStudents.filter(s=>s.validCompare), k, 'r1Ref'));
+                    let r2 = coreSubj.map(k => calculateNonZeroMean(sciStudents.filter(s=>s.validCompare), k));
+                    datasets.push({ label: 'วิทย์ (รอบ 1)', data: r1, backgroundColor: 'rgba(59, 130, 246, 0.3)', borderRadius: 4, datalabels: { display: false } });
+                    datasets.push({ label: 'วิทย์ (รอบ 2)', data: r2, backgroundColor: 'rgba(59, 130, 246, 1)', borderRadius: 4, datalabels: { display: true, align: 'end', anchor: 'end', color: '#1e3a8a', font: {size: 10, weight: 'bold'}, formatter: v=>v>0?v.toFixed(1)+'%':'' } });
+                    allVals.push(...r1, ...r2);
+                }
+                if (state.filter === 'all' || state.filter === 'art') {
+                    let r1 = coreSubj.map(k => calculateNonZeroMean(artStudents.filter(s=>s.validCompare), k, 'r1Ref'));
+                    let r2 = coreSubj.map(k => calculateNonZeroMean(artStudents.filter(s=>s.validCompare), k));
+                    datasets.push({ label: 'ศิลป์ (รอบ 1)', data: r1, backgroundColor: 'rgba(245, 158, 11, 0.3)', borderRadius: 4, datalabels: { display: false } });
+                    datasets.push({ label: 'ศิลป์ (รอบ 2)', data: r2, backgroundColor: 'rgba(245, 158, 11, 1)', borderRadius: 4, datalabels: { display: true, align: 'end', anchor: 'end', color: '#b45309', font: {size: 10, weight: 'bold'}, formatter: v=>v>0?v.toFixed(1)+'%':'' } });
+                    allVals.push(...r1, ...r2);
+                }
+            } else {
+                if (state.filter === 'all' || state.filter === 'science') {
+                    let avg = coreSubj.map(k => calculateNonZeroMean(sciStudents, k));
+                    datasets.push({ label: 'สายวิทย์-คณิต', data: avg, backgroundColor: 'rgba(59, 130, 246, 0.9)', borderRadius: 6, datalabels: { display: true, align: 'end', anchor: 'end', color: '#1e3a8a', font: {size: 10, weight: 'bold'}, formatter: v=>v>0?v.toFixed(1)+'%':'' } });
+                    allVals.push(...avg);
+                }
+                if (state.filter === 'all' || state.filter === 'art') {
+                    let avg = coreSubj.map(k => calculateNonZeroMean(artStudents, k));
+                    datasets.push({ label: 'สายศิลป์', data: avg, backgroundColor: 'rgba(245, 158, 11, 0.9)', borderRadius: 6, datalabels: { display: true, align: 'end', anchor: 'end', color: '#b45309', font: {size: 10, weight: 'bold'}, formatter: v=>v>0?v.toFixed(1)+'%':'' } });
+                    allVals.push(...avg);
+                }
             }
-            if (state.filter === 'all' || state.filter === 'art') {
-                datasets.push({
-                    label: 'สายศิลป์',
-                    data: artAverages,
-                    backgroundColor: 'rgba(245, 158, 11, 0.9)', 
-                    borderRadius: 6
-                });
-                allPlottedValues.push(...artAverages);
-            }
 
-            // Dynamic Scale Logic (add 15% headroom for labels)
-            let maxDataVal = Math.max(...allPlottedValues.filter(v => !isNaN(v)));
-            let dynamicMaxScale = maxDataVal > 0 ? Math.min(100, Math.ceil(maxDataVal * 1.15)) : 100;
+            let maxVal = Math.max(...allVals.filter(v => !isNaN(v) && v > 0), 10);
+            let barScaleMax = Math.min(100, Math.ceil(maxVal * 1.15));
 
-            charts.bar = new Chart(ctx, {
+            charts.bar = new Chart(ctxBar, {
                 type: 'bar',
-                data: {
-                    labels: coreSubjects.map(k => SUBJECTS[k].name),
-                    datasets: datasets
-                },
+                data: { labels: coreSubj.map(k => SUBJECTS[k].name), datasets: datasets },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } },
-                        datalabels: { // Enable % on top of bars
-                            display: true,
-                            align: 'end',
-                            anchor: 'end',
-                            color: '#475569',
-                            font: { family: 'Inter', weight: 'bold', size: 11 },
-                            formatter: function(value) { return value > 0 ? value.toFixed(1) + '%' : ''; }
-                        }
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            max: dynamicMaxScale, // Apply Dynamic Scale
-                            grid: { borderDash: [4, 4] },
-                            ticks: { callback: function(val){ return val + '%'; } }
-                        },
-                        x: { grid: { display: false } }
-                    }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } },
+                    scales: { y: { max: barScaleMax, ticks: { callback: v => v + '%' } }, x: { grid: { display: false } } }
+                }
+            });
+
+            // Handle Radar Visibility
+            document.getElementById('radar-wrapper-sci').style.display = (state.filter === 'all' || state.filter === 'science') ? 'flex' : 'none';
+            document.getElementById('radar-wrapper-art').style.display = (state.filter === 'all' || state.filter === 'art') ? 'flex' : 'none';
+            
+            renderRadar('radarChartSci', 'science', sciStudents);
+            renderRadar('radarChartArt', 'art', artStudents);
+        }
+
+        function renderRadar(canvasId, streamFilter, targetStudents) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            if (charts[canvasId]) charts[canvasId].destroy();
+            
+            let keys = Object.keys(SUBJECTS).filter(k => !SUBJECTS[k].stream || SUBJECTS[k].stream === streamFilter);
+            let labels = keys.map(k => SUBJECTS[k].name);
+            let datasets = []; let allData = [];
+            let baseColor = streamFilter === 'science' ? '59, 130, 246' : '245, 158, 11';
+
+            if(state.round === 'compare') {
+                let validTargets = targetStudents.filter(s=>s.validCompare);
+                let r1 = keys.map(k => calculateNonZeroMean(validTargets, k, 'r1Ref'));
+                let r2 = keys.map(k => calculateNonZeroMean(validTargets, k));
+                
+                datasets.push({
+                    label: 'รอบ 1', data: r1, backgroundColor: `rgba(${baseColor}, 0.1)`, borderColor: `rgba(${baseColor}, 0.3)`, borderDash: [5,5], borderWidth: 2, pointRadius: 3,
+                    datalabels: { display: false } // Hide labels for Round 1 to avoid clutter
+                });
+                datasets.push({
+                    label: 'รอบ 2 (ล่าสุด)', data: r2, backgroundColor: `rgba(${baseColor}, 0.35)`, borderColor: `rgba(${baseColor}, 1)`, borderWidth: 2, pointBackgroundColor: `rgba(${baseColor}, 1)`,
+                    datalabels: { display: true, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: 3, font: { size: 9, weight: 'bold' }, color: `rgb(${baseColor})`, formatter: v => v > 0 ? v.toFixed(1) + '%' : '', borderWidth: 1, borderColor: `rgba(${baseColor}, 0.2)` }
+                });
+                allData.push(...r1, ...r2);
+            } else {
+                let data = keys.map(k => calculateNonZeroMean(targetStudents, k));
+                datasets.push({
+                    label: 'ผลสัมฤทธิ์ (%)', data: data, backgroundColor: `rgba(${baseColor}, 0.25)`, borderColor: `rgba(${baseColor}, 1)`, borderWidth: 2, pointBackgroundColor: `rgba(${baseColor}, 1)`,
+                    datalabels: { display: true, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 4, padding: 3, font: { size: 9, weight: 'bold' }, color: `rgb(${baseColor})`, formatter: v => v > 0 ? v.toFixed(1) + '%' : '', borderWidth: 1, borderColor: `rgba(${baseColor}, 0.2)` }
+                });
+                allData.push(...data);
+            }
+
+            let maxVal = Math.max(...allData.filter(v => !isNaN(v) && v > 0), 10);
+            let radarScaleMax = Math.min(100, Math.ceil(maxVal + 5));
+
+            charts[canvasId] = new Chart(ctx, {
+                type: 'radar',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { angleLines: { display: true }, min: 0, max: radarScaleMax, ticks: { display: false, stepSize: radarScaleMax/5 }, pointLabels: { font: { size: 11, weight: '600' } } } },
+                    plugins: { legend: { display: state.round === 'compare', position: 'bottom', labels: { usePointStyle: true } } }
                 }
             });
         }
 
-        function renderRadarCharts() {
-            // Manage Container Visibility based on Global Filter
-            document.getElementById('radar-container-sci').style.display = (state.filter === 'all' || state.filter === 'science') ? 'block' : 'none';
-            document.getElementById('radar-container-art').style.display = (state.filter === 'all' || state.filter === 'art') ? 'block' : 'none';
-
-            // Common datalabel config for Radars
-            const radarDatalabelsConfig = {
-                display: true,
-                color: '#0f172a',
-                backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                borderRadius: 4,
-                borderWidth: 1,
-                borderColor: 'rgba(0,0,0,0.1)',
-                font: { family: 'Inter', weight: 'bold', size: 10 },
-                padding: { top: 2, bottom: 2, left: 4, right: 4 },
-                formatter: function(value) { return value > 0 ? value.toFixed(1) + '%' : ''; }
-            };
-
-            // --- Sci Radar ---
-            const ctxSci = document.getElementById('radarChartSci').getContext('2d');
-            if (charts.radarSci) charts.radarSci.destroy();
-            
-            const sciStudents = rawStudents.filter(s => s.stream === 'science');
-            let sciKeys = Object.keys(SUBJECTS).filter(k => !SUBJECTS[k].stream || SUBJECTS[k].stream === 'science');
-            let sciLabels = sciKeys.map(k => SUBJECTS[k].name);
-            let sciData = sciKeys.map(k => calculateNonZeroMean(sciStudents, k));
-            
-            // Dynamic close-scale (touches the edge + slightly more padding for labels)
-            let sciMaxVal = Math.max(...sciData.filter(v => !isNaN(v)));
-            let sciMaxScale = sciMaxVal > 0 ? Math.min(100, Math.ceil(sciMaxVal + 10)) : 100;
-
-            charts.radarSci = new Chart(ctxSci, {
-                type: 'radar',
-                data: {
-                    labels: sciLabels,
-                    datasets: [{
-                        label: 'สายวิทย์-คณิต',
-                        data: sciData,
-                        backgroundColor: 'rgba(59, 130, 246, 0.25)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { 
-                        r: { 
-                            angleLines: { display: true }, 
-                            suggestedMin: 0, 
-                            max: sciMaxScale, 
-                            ticks: { display: false } 
-                        } 
-                    },
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { callbacks: { label: function(context) { return context.raw.toFixed(1) + '%'; } } },
-                        datalabels: radarDatalabelsConfig
-                    }
-                }
-            });
-
-            // --- Art Radar ---
-            const ctxArt = document.getElementById('radarChartArt').getContext('2d');
-            if (charts.radarArt) charts.radarArt.destroy();
-            
-            const artStudents = rawStudents.filter(s => s.stream === 'art');
-            let artKeys = Object.keys(SUBJECTS).filter(k => !SUBJECTS[k].stream || SUBJECTS[k].stream === 'art');
-            let artLabels = artKeys.map(k => SUBJECTS[k].name);
-            let artData = artKeys.map(k => calculateNonZeroMean(artStudents, k));
-            
-            // Dynamic close-scale (touches the edge + slightly more padding for labels)
-            let artMaxVal = Math.max(...artData.filter(v => !isNaN(v)));
-            let artMaxScale = artMaxVal > 0 ? Math.min(100, Math.ceil(artMaxVal + 10)) : 100;
-
-            charts.radarArt = new Chart(ctxArt, {
-                type: 'radar',
-                data: {
-                    labels: artLabels,
-                    datasets: [{
-                        label: 'สายศิลป์',
-                        data: artData,
-                        backgroundColor: 'rgba(245, 158, 11, 0.25)',
-                        borderColor: 'rgba(245, 158, 11, 1)',
-                        pointBackgroundColor: 'rgba(245, 158, 11, 1)',
-                        borderWidth: 2,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: { 
-                        r: { 
-                            angleLines: { display: true }, 
-                            suggestedMin: 0, 
-                            max: artMaxScale, 
-                            ticks: { display: false } 
-                        } 
-                    },
-                    plugins: { 
-                        legend: { display: false }, 
-                        tooltip: { callbacks: { label: function(context) { return context.raw.toFixed(1) + '%'; } } },
-                        datalabels: radarDatalabelsConfig
-                    }
-                }
-            });
-        }
-
-        function renderSubjectRings() {
+        function renderSubjectRings(students) {
             const container = document.getElementById('ring-charts-container');
             container.innerHTML = '';
             
-            const students = getFilteredStudents();
-
             Object.entries(SUBJECTS).forEach(([key, subj]) => {
                 if (state.filter !== 'all' && subj.stream && subj.stream !== state.filter) return;
-
                 const avg = calculateNonZeroMean(students, key);
-                if (avg === 0 && students.length > 0) return;
+                
+                if (avg === 0 && students.length === 0) return;
+
+                let diffHtml = '';
+                if (state.round === 'compare') {
+                    let validCompares = students.filter(s=>s.validCompare);
+                    let r1Avg = calculateNonZeroMean(validCompares, key, 'r1Ref');
+                    let r2Avg = calculateNonZeroMean(validCompares, key);
+                    
+                    if(validCompares.length > 0) {
+                        let diff = r2Avg - r1Avg;
+                        let color = diff > 0 ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : diff < 0 ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-slate-500 bg-slate-50 border-slate-200';
+                        let arrow = diff > 0 ? '▲ +' : diff < 0 ? '▼ ' : '';
+                        diffHtml = `<div class="${color} text-[10px] font-bold mt-2 px-2 py-0.5 rounded-full inline-flex items-center border shadow-sm">${arrow}${diff.toFixed(1)}%</div>`;
+                    }
+                }
 
                 const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center relative hover:shadow-md transition-all group";
+                card.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center relative hover:shadow-md transition-shadow group";
                 
-                const canvasId = `ring-${key}`;
                 card.innerHTML = `
-                    <div class="absolute top-4 left-4 text-2xl group-hover:scale-110 transition-transform">${subj.emoji}</div>
-                    <div class="h-28 w-28 relative mt-5 mb-3">
-                        <canvas id="${canvasId}"></canvas>
-                        <!-- Center Label % inside ring -->
-                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span class="text-xl font-black text-slate-800 tracking-tight leading-none">${avg.toFixed(1)}</span>
-                            <span class="text-[10px] font-bold text-slate-400 leading-none mt-1">%</span>
+                    <div class="absolute top-4 left-4 text-2xl opacity-80 group-hover:opacity-100 transition-opacity bg-slate-50 p-1.5 rounded-lg border border-slate-100 shadow-sm">${subj.emoji}</div>
+                    <div class="h-28 w-28 relative mt-4 mb-2">
+                        <canvas id="ring-${key}" class="absolute inset-0 z-10"></canvas>
+                        <div class="ring-center-text z-0 text-center pointer-events-none">
+                            <span class="text-xl font-black text-slate-800 leading-none">${avg.toFixed(1)}</span>
+                            <span class="text-[10px] font-bold text-slate-400 leading-none mt-0.5">%</span>
                         </div>
                     </div>
-                    <h4 class="font-bold text-slate-800 text-sm mb-3">${subj.name}</h4>
-                    <button onclick="openBlueprint('${key}')" class="text-xs bg-slate-50 hover:bg-brand-50 hover:text-brand-700 text-slate-600 font-medium px-4 py-2 rounded-xl w-full flex items-center justify-center gap-1.5 transition-colors border border-slate-200">
-                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> A-Level Blueprints
+                    <h4 class="font-bold text-slate-800 text-sm mt-1">${subj.name}</h4>
+                    ${diffHtml}
+                    <button onclick="openBlueprint('${key}', ${avg})" class="text-[11px] font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-xl w-full flex items-center justify-center gap-1.5 mt-4 transition-colors border border-indigo-100">
+                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i> TCAS Blueprint
                     </button>
                 `;
                 container.appendChild(card);
-
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                new Chart(ctx, {
+                
+                new Chart(document.getElementById(`ring-${key}`).getContext('2d'), {
                     type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: [avg, 100 - avg],
-                            backgroundColor: [subj.color, '#f1f5f9'],
-                            borderWidth: 0,
-                            circumference: 360,
-                            rotation: 270,
-                            borderRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        cutout: '78%',
-                        plugins: { 
-                            tooltip: { enabled: false }, 
-                            legend: { display: false },
-                            datalabels: { display: false } // Hide datalabels for rings, we use HTML center
-                        }
-                    }
+                    data: { datasets: [{ data: [avg, 100 - avg], backgroundColor: [subj.color, '#f1f5f9'], borderWidth: 0, circumference: 360, rotation: 270 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '78%', plugins: { tooltip: { enabled: false }, datalabels: { display: false } } }
                 });
             });
             lucide.createIcons();
         }
 
-        // --- 5. TABLE & MODALS ---
         function sortTable(col) {
-            if (state.sortCol === col) {
-                state.sortAsc = !state.sortAsc; 
-            } else {
-                state.sortCol = col;
-                state.sortAsc = true;
-            }
+            if (state.sortCol === col) state.sortAsc = !state.sortAsc; else { state.sortCol = col; state.sortAsc = true; }
             renderTable();
         }
 
-        function renderTable() {
+        function renderTable(studentsArray) {
+            if (!studentsArray) studentsArray = getActiveStudents();
             const tbody = document.getElementById('student-tbody');
             tbody.innerHTML = '';
             
-            let students = getFilteredStudents();
             const search = document.getElementById('search-student').value.toLowerCase();
-
             if (search) {
-                students = students.filter(s => s.name.toLowerCase().includes(search) || s.id.toString().includes(search));
+                studentsArray = studentsArray.filter(s => s.name.toLowerCase().includes(search) || s.id.toString().includes(search) || (s.room && s.room.toLowerCase().includes(search)));
             }
 
-            students.sort((a, b) => {
-                let valA = a[state.sortCol];
-                let valB = b[state.sortCol];
-                
-                // Special handling for status sorting
-                if (state.sortCol === 'status') {
-                    const getStatusVal = (s) => s.isMissing ? 0 : (s.percent >= state.passCriteria ? 2 : 1);
-                    valA = getStatusVal(a);
-                    valB = getStatusVal(b);
-                }
-
-                if (typeof valA === 'string') valA = valA.toLowerCase();
-                if (typeof valB === 'string') valB = valB.toLowerCase();
-
-                if (valA < valB) return state.sortAsc ? -1 : 1;
-                if (valA > valB) return state.sortAsc ? 1 : -1;
-                return 0;
+            studentsArray.sort((a, b) => {
+                let valA = a[state.sortCol]; let valB = b[state.sortCol];
+                if (state.sortCol === 'status') { valA = a.isMissing?-1:(a.percent>=state.passCriteria?1:0); valB = b.isMissing?-1:(b.percent>=state.passCriteria?1:0); }
+                if (typeof valA === 'string') valA = valA.toLowerCase(); if (typeof valB === 'string') valB = valB.toLowerCase();
+                if (valA < valB) return state.sortAsc ? -1 : 1; if (valA > valB) return state.sortAsc ? 1 : -1; return 0;
             });
 
-            students.forEach(s => {
+            studentsArray.forEach(s => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-brand-50/50 border-b border-slate-100 last:border-0 transition-colors";
+                tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0 transition-colors";
                 
-                let statusBadge = '';
-                if (s.isMissing) {
-                    statusBadge = '<span class="px-2.5 py-1 bg-slate-100 text-slate-500 border border-slate-200 text-xs rounded-lg font-medium">(ขาดสอบ)</span>';
-                } else if (s.percent >= state.passCriteria) {
-                    statusBadge = '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs rounded-lg font-bold">ผ่านเกณฑ์</span>';
-                } else {
-                    statusBadge = '<span class="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 text-xs rounded-lg font-bold">ควรปรับปรุง</span>';
+                let statusBadge = s.isMissing ? '<span class="px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] uppercase font-bold rounded-md">ขาดสอบ</span>' : 
+                                  s.percent >= state.passCriteria ? '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-[10px] uppercase font-bold rounded-md border border-emerald-200">ผ่านเกณฑ์</span>' : 
+                                  '<span class="px-2.5 py-1 bg-rose-100 text-rose-700 text-[10px] uppercase font-bold rounded-md border border-rose-200">ควรปรับปรุง</span>';
+                
+                let devCol = '';
+                if(state.round === 'compare') {
+                    let diff = s.diffPercent || 0;
+                    let color = diff > 0 ? 'text-emerald-600' : diff < 0 ? 'text-rose-600' : 'text-slate-400';
+                    let arrow = diff > 0 ? '▲ +' : diff < 0 ? '▼ ' : '';
+                    let text = s.validCompare ? `${arrow}${diff.toFixed(2)}%` : '-';
+                    devCol = `<td class="px-5 py-4 text-center font-black ${color} bg-amber-50/30 border-l border-r border-amber-50/50">${text}</td>`;
                 }
 
-                const streamBadge = s.stream === 'science' 
-                    ? '<span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-medium">วิทย์-คณิต</span>'
-                    : '<span class="px-2 py-1 bg-amber-50 text-amber-700 rounded-md text-xs font-medium">สายศิลป์</span>';
-
                 tr.innerHTML = `
-                    <td class="px-5 py-3.5 text-slate-600 font-medium">${s.id}</td>
-                    <td class="px-5 py-3.5 text-slate-500">${s.no}</td>
-                    <td class="px-5 py-3.5 font-bold text-slate-800">${s.name}</td>
-                    <td class="px-5 py-3.5">${streamBadge}</td>
-                    <td class="px-5 py-3.5 font-bold ${s.isMissing ? 'text-slate-400' : 'text-slate-800'}">${s.isMissing ? '-' : s.totalScore.toFixed(2) + ' <span class="text-xs text-slate-400 font-normal">/ ' + s.maxScore + '</span>'}</td>
-                    <td class="px-5 py-3.5 font-black ${s.isMissing ? 'text-slate-400' : 'text-brand-600'}">${s.isMissing ? '-' : s.percent.toFixed(2) + '%'}</td>
-                    <td class="px-5 py-3.5">${statusBadge}</td>
-                    <td class="px-5 py-3.5 text-right">
-                        <button onclick="viewStudent('${s.id}')" class="text-xs bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 text-slate-600 font-medium px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1.5 ml-auto">
+                    <td class="px-5 py-4 text-slate-500 font-medium">${s.id}</td>
+                    <td class="px-5 py-4 text-slate-500 font-medium">${s.room || '-'}</td>
+                    <td class="px-5 py-4 font-bold text-slate-800">${s.name}</td>
+                    <td class="px-5 py-4 text-center"><span class="px-2.5 py-1 bg-slate-100 rounded-md text-slate-600 text-[10px] font-bold uppercase border border-slate-200">${s.streamName}</span></td>
+                    <td class="px-5 py-4 text-center font-black ${s.isMissing?'text-slate-400':'text-slate-700'}">${s.isMissing?'-':s.totalScore.toFixed(2)}</td>
+                    <td class="px-5 py-4 text-center font-black ${s.isMissing?'text-slate-400':'text-brand-600'}">${s.isMissing?'-':s.percent.toFixed(2)+'%'}</td>
+                    ${devCol}
+                    <td class="px-5 py-4 text-center">${statusBadge}</td>
+                    <td class="px-5 py-4 text-right">
+                        <button onclick="viewStudent('${s.id}')" class="text-xs bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all flex items-center gap-1.5 ml-auto">
                             <i data-lucide="line-chart" class="w-3.5 h-3.5"></i> ดูข้อมูล
                         </button>
                     </td>
@@ -870,165 +926,98 @@
             lucide.createIcons();
         }
 
-        function filterTable() {
-            renderTable();
+        // Tweak: Lighter version of HEX color helper (opacity 40% -> hex '66')
+        function getLighterColor(hex) {
+            return hex + '66'; 
         }
 
         function viewStudent(id) {
-            const student = rawStudents.find(s => s.id == id);
+            let list = getActiveStudents();
+            const student = list.find(s => s.id == id);
             if (!student) return;
 
             document.getElementById('st-name').innerText = student.name;
-            document.getElementById('st-meta').innerHTML = `<i data-lucide="user-square" class="w-4 h-4"></i> รหัส: ${student.id} | เลขที่: ${student.no} | ${student.streamName}`;
-            
-            document.getElementById('st-total').innerText = student.isMissing ? '-' : `${student.totalScore.toFixed(2)} / ${student.maxScore}`;
+            document.getElementById('st-stream').innerText = student.streamName;
+            document.getElementById('st-meta').innerText = `รหัส: ${student.id} | ห้อง: ${student.room || '-'}`;
+            document.getElementById('st-total').innerText = student.isMissing ? '-' : `${student.totalScore.toFixed(2)}/${student.maxScore}`;
             document.getElementById('st-percent').innerText = student.isMissing ? '-' : `${student.percent.toFixed(2)}%`;
 
             const ctx = document.getElementById('studentBarChart').getContext('2d');
             if (charts.studentBar) charts.studentBar.destroy();
 
-            let labels = [];
-            let data = [];
-            let colors = [];
-
+            let labels = []; let data = []; let dataR1 = []; let colors = []; let lightColors = [];
             Object.entries(SUBJECTS).forEach(([key, subj]) => {
                 if (subj.stream && subj.stream !== student.stream) return;
                 labels.push(subj.name);
                 data.push(student.scores[key] || 0);
+                if(state.round === 'compare') {
+                    dataR1.push(student.r1Ref ? (student.r1Ref.scores[key]||0) : 0);
+                }
                 colors.push(subj.color);
+                lightColors.push(getLighterColor(subj.color));
             });
+
+            let datasets = [];
+            if (state.round === 'compare' && student.validCompare) {
+                datasets.push({ label: 'รอบ 1', data: dataR1, backgroundColor: lightColors, borderColor: colors, borderWidth: 1, borderRadius: 4 });
+                datasets.push({ label: 'รอบ 2 (ล่าสุด)', data: data, backgroundColor: colors, borderRadius: 4 });
+            } else {
+                datasets.push({ label: 'คะแนนที่ได้', data: data, backgroundColor: colors, borderRadius: 4 });
+            }
 
             charts.studentBar = new Chart(ctx, {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'คะแนนที่ได้',
-                        data: data,
-                        backgroundColor: colors,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    indexAxis: 'y', 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: {
-                            display: true,
-                            align: 'end',
-                            anchor: 'end',
-                            color: '#1e293b',
-                            font: { family: 'Inter', weight: 'bold', size: 11 },
-                            formatter: function(value) { return value > 0 ? value.toFixed(1) : ''; }
-                        }
-                    },
-                    scales: {
-                        x: { beginAtZero: true, max: 100, grid: { borderDash: [4, 4] } },
-                        y: { grid: { display: false } }
-                    }
+                data: { labels: labels, datasets: datasets },
+                options: { 
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false, 
+                    plugins: { legend: { display: (state.round === 'compare' && student.validCompare), position: 'top' }, datalabels: { display: true, align: 'end', anchor: 'end', font: {size: 10, weight: 'bold'}, formatter: v => v>0?v.toFixed(1):'' } }, 
+                    scales: { x: { max: 100 } } 
                 }
             });
 
-            document.getElementById('modal-student').classList.remove('hidden');
-            document.getElementById('modal-student').classList.add('flex');
-            lucide.createIcons();
+            document.getElementById('modal-student').classList.remove('hidden'); document.getElementById('modal-student').classList.add('flex');
         }
 
-        // TCAS Blueprint Content Database (Historical 5-Years)
-        const TCAS_BLUEPRINTS = {
-            'math': { topics: ['สถิติและการแจกแจงความน่าจะเป็น (20-25%)', 'แคลคูลัส (15-20%)', 'เรขาคณิตวิเคราะห์และภาคตัดกรวย (10-15%)', 'ฟังก์ชันเอกซ์โพเนนเชียลและลอการิทึม (10%)', 'ลำดับและอนุกรม (10%)'], focus: 'ข้อสอบเน้นการประยุกต์ใช้ในสถานการณ์จริง (Applied Mathematics) ลดการคำนวณที่ซับซ้อนแต่ต้องตีโจทย์ให้แตกในเวลาจำกัด' },
-            'physics': { topics: ['กลศาสตร์ (30-35%)', 'คลื่น เสียง และแสง (20-25%)', 'ไฟฟ้าและแม่เหล็ก (20-25%)', 'ความร้อนและก๊าซ (10%)', 'ฟิสิกส์อะตอมและนิวเคลียร์ (10%)'], focus: 'เน้นความเข้าใจคอนเซปต์ทางฟิสิกส์ การทดลอง และการวิเคราะห์ข้อมูลจากกราฟ มากกว่าการแทนค่าสูตรตรงๆ' },
-            'chem': { topics: ['ปริมาณสารสัมพันธ์ (20%)', 'พันธะเคมีและสมบัติของธาตุ (20%)', 'กรด-เบส และเคมีไฟฟ้า (20%)', 'เคมีอินทรีย์และพอลิเมอร์ (20%)', 'อัตราการเกิดปฏิกิริยาและสมดุลเคมี (20%)'], focus: 'การคำนวณเคมีค่อนข้างซับซ้อน ต้องแม่นยำเรื่องหน่วย (Units) และเน้นความเข้าใจการจัดเรียงอิเล็กตรอนและการทดลอง' },
-            'bio': { topics: ['พันธุศาสตร์และวิวัฒนาการ (25%)', 'ระบบร่างกายสัตว์และมนุษย์ (25%)', 'พืช (20%)', 'เซลล์และการแบ่งเซลล์ (15%)', 'ระบบนิเวศ (15%)'], focus: 'ข้อสอบข้อความยาว เน้นทักษะการวิเคราะห์ข้อมูลและการสรุปผลจากการทดลอง (Data Analysis) ไม่ใช่แค่การท่องจำ' },
-            'thai': { topics: ['การอ่านจับใจความและตีความ (40%)', 'หลักภาษาและการใช้ภาษา (30%)', 'การเขียนและการเรียงประโยค (20%)', 'วรรณคดีวิจักษ์ (10%)'], focus: 'บทความค่อนข้างยาว ต้องบริหารเวลาให้ดี เน้นการหา Main Idea และทิศทางความคิดของผู้เขียนให้เจออย่างรวดเร็ว' },
-            'social': { topics: ['ประวัติศาสตร์สากลและไทย (20%)', 'หน้าที่พลเมืองและกฎหมาย (20%)', 'เศรษฐศาสตร์ (20%)', 'ภูมิศาสตร์ (20%)', 'ศาสนาและจริยธรรม (20%)'], focus: 'เกาะติดสถานการณ์ปัจจุบัน (Current Events) เชื่อมโยงกับทฤษฎีหลัก มักออกข่าวเด่นในรอบปีมาประยุกต์' },
-            'eng': { topics: ['Reading Comprehension (50%)', 'Conversation & Dialogues (25%)', 'Vocabulary & Cloze Test (15%)', 'Grammar (10%)'], focus: 'คำศัพท์เป็น Academic Vocabulary เน้นทักษะ Skimming & Scanning สำหรับบทความยาว (Articles, News, Ads)' },
-            'sci': { topics: ['วิทยาศาสตร์โลกและอวกาศ (35%)', 'วิทยาศาสตร์กายภาพ (35%)', 'วิทยาศาสตร์ชีวภาพ (30%)'], focus: 'ข้อสอบไม่ลงลึกเท่าสายวิทย์ แต่กว้าง เน้นปรากฏการณ์ทางธรรมชาติ เทคโนโลยี และวิทยาศาสตร์ในชีวิตประจำวัน' }
-        };
-
-        function openBlueprint(subjKey) {
+        function openBlueprint(subjKey, currentAvg) {
             const subj = SUBJECTS[subjKey];
-            document.getElementById('bp-title').innerHTML = `${subj.emoji} A-Level Blueprint: ${subj.name}`;
+            document.getElementById('bp-title').innerHTML = `<span class="bg-indigo-800 p-2 rounded-lg text-xl">${subj.emoji}</span> <span>TCAS A-Level Blueprint: ${subj.name}</span>`;
             
-            // Generate Dynamic Teaching Plan based on Real Dataset
-            let currentAvg = calculateNonZeroMean(getFilteredStudents(), subjKey);
-            let planLevel = '';
-            let planDesc = '';
-            
+            let actionPlan = ''; let alertColor = '';
             if (currentAvg === 0) {
-                 planLevel = '<span class="text-slate-500 font-bold">ไม่มีข้อมูลคะแนน (No Data)</span>';
-                 planDesc = 'ยังไม่มีสถิติคะแนนเพียงพอในการประเมินยุทธศาสตร์สำหรับวิชานี้';
+                alertColor = 'slate'; actionPlan = `<p class="text-slate-700">ไม่มีข้อมูลคะแนนสำหรับการประเมินแผน</p>`;
             } else if (currentAvg < 40) {
-                planLevel = '<span class="text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">ระดับวิกฤต (เฉลี่ยต่ำกว่า 40%)</span>';
-                planDesc = 'นักเรียนส่วนใหญ่ยังขาดความเข้าใจในแก่นของวิชานี้ (Core Concepts) <br><br><b>แผนพัฒนาที่เหมาะสม:</b> ควรงดการตะลุยโจทย์ระดับประยุกต์หรือโจทย์แข่งขันชั่วคราว และกลับมาปูพื้นฐานใหม่โดยด่วน จัดทำสื่อสรุปเนื้อหาหลัก (Mind Mapping) และใช้โจทย์ระดับพื้นฐานเพื่อสร้างความมั่นใจและฐานที่แน่นหนาก่อน';
+                alertColor = 'rose';
+                actionPlan = `<p class="text-rose-700 font-bold mb-1">สถานะ: วิกฤต (Urgent Foundation)</p><p class="text-slate-600 text-sm leading-relaxed">คะแนนเฉลี่ยปัจจุบันอยู่ที่ ${currentAvg.toFixed(1)}% สะท้อนถึงการขาดความเข้าใจในแก่นทฤษฎีพื้นฐาน แนะนำให้จัด <b>"คลินิกวิชาการปรับพื้นฐาน"</b> งดการทำโจทย์ประยุกต์ซับซ้อนชั่วคราว ให้เน้นทำแบบฝึกหัดทบทวนคอนเซปต์เบื้องต้นให้แน่นก่อน</p>`;
             } else if (currentAvg < 60) {
-                planLevel = '<span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">ระดับปานกลาง/เฝ้าระวัง (เฉลี่ย 40% - 60%)</span>';
-                planDesc = 'นักเรียนมีความรู้พื้นฐานดีระดับหนึ่ง แต่มักจะทำข้อสอบประยุกต์พลาด หรือบริหารเวลาทำข้อสอบไม่ทัน <br><br><b>แผนพัฒนาที่เหมาะสม:</b> เน้นการวิเคราะห์ข้อสอบย้อนหลัง (Past Papers) จับเวลาทำจริงแบบ Mock Test และให้ครูผู้สอนจัดทำ "Error Log" ให้นักเรียนจดบันทึกข้อที่ตัวเองทำผิดซ้ำซาก เพื่ออุดรอยรั่วให้ตรงจุด';
+                alertColor = 'amber';
+                actionPlan = `<p class="text-amber-700 font-bold mb-1">สถานะ: เฝ้าระวัง (Practice & Drill)</p><p class="text-slate-600 text-sm leading-relaxed">คะแนนเฉลี่ยปัจจุบันอยู่ที่ ${currentAvg.toFixed(1)}% นักเรียนมีความเข้าใจพื้นฐาน แต่ยังประยุกต์ใช้กับโจทย์ A-Level ไม่คล่อง แนะนำให้ <b>"เพิ่มชั่วโมงทำข้อสอบย้อนหลัง (Past Papers Drill)"</b> โดยจับเวลาจริง</p>`;
             } else {
-                planLevel = '<span class="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">ระดับดี/ต่อยอด (เฉลี่ยสูงกว่า 60%)</span>';
-                planDesc = 'ภาพรวมนักเรียนมีศักยภาพสูงและทำความเข้าใจในวิชานี้ได้ดีมาก <br><br><b>แผนพัฒนาที่เหมาะสม:</b> ใช้ชุดข้อสอบจำลองที่มีความยากเทียบเท่าหรือสูงกว่าข้อสอบ A-Level เล็กน้อย และเน้นสอน "เทคนิคการตัดช้อยส์และจุดหลอก" เพื่อเร่งความเร็วในการทำโจทย์ หวังผลคะแนนระดับ Top 10% ของประเทศ';
+                alertColor = 'emerald';
+                actionPlan = `<p class="text-emerald-700 font-bold mb-1">สถานะ: ต่อยอด (Advanced Mastery)</p><p class="text-slate-600 text-sm leading-relaxed">คะแนนเฉลี่ยปัจจุบันอยู่ที่ ${currentAvg.toFixed(1)}% ฐานความรู้แข็งแรง สามารถต่อยอดสู่การทำโจทย์ระดับ <b>"Advanced / Unseen Problems"</b> ได้ แนะนำให้จัดหาโจทย์แนวประยุกต์ข้ามบทเพื่อเตรียมความพร้อมสู่มหาวิทยาลัยชั้นนำ</p>`;
             }
 
-            const blueprintData = TCAS_BLUEPRINTS[subjKey] || { topics: ['รออัปเดตข้อมูลโครงสร้างข้อสอบ'], focus: 'การประยุกต์ใช้ความรู้ (Applied Knowledge)' };
-            const topicsHtml = blueprintData.topics.map(t => `<li>${t}</li>`).join('');
-
-            let content = `
-                <div class="space-y-6 text-sm text-slate-700">
-                    <!-- Dynamic Data Plan -->
-                    <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 shadow-sm">
-                        <h4 class="font-bold text-indigo-900 mb-3 flex items-center gap-2"><i data-lucide="line-chart" class="w-5 h-5 text-indigo-600"></i> สถานการณ์และแผนพัฒนา (อ้างอิงจากคะแนนสอบจริง)</h4>
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="font-medium text-slate-600">สถานะภาพรวม:</span> 
-                            ${planLevel} 
-                            <span class="font-black text-indigo-600 ml-auto text-lg">${currentAvg.toFixed(1)}%</span>
-                        </div>
-                        <p class="text-slate-700 bg-white p-4 rounded-xl border border-indigo-100 leading-relaxed shadow-sm">${planDesc}</p>
-                    </div>
-
-                    <!-- TCAS Historical Data -->
+            document.getElementById('bp-content').innerHTML = `
+                <div class="space-y-6">
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <h4 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5 text-slate-500"></i> สถิติหัวข้อที่ออกสอบบ่อย (ย้อนหลัง 5 ปี TCAS)</h4>
-                        <ul class="list-disc pl-5 space-y-2 text-slate-600 marker:text-brand-400 font-medium">
-                            ${topicsHtml}
-                        </ul>
+                        <h4 class="font-black text-slate-800 mb-3 flex items-center gap-2 uppercase tracking-wide text-sm"><i data-lucide="book-open-check" class="text-brand-500 w-5 h-5"></i> โครงสร้างข้อสอบ (TCAS ย้อนหลัง 5 ปี)</h4>
+                        <div class="p-4 bg-slate-50 rounded-xl text-slate-700 text-sm font-medium border border-slate-100 leading-relaxed">${subj.bp}</div>
                     </div>
-
-                    <!-- Test Focus -->
-                    <div>
-                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-rose-500"></i> ลักษณะข้อสอบ (Test Focus)</h4>
-                        <p class="bg-slate-50 border border-slate-100 px-5 py-4 rounded-xl text-slate-600 leading-relaxed font-medium shadow-sm">${blueprintData.focus}</p>
+                    <div class="bg-white p-5 rounded-2xl border border-${alertColor}-200 shadow-sm">
+                        <h4 class="font-black text-slate-800 mb-3 flex items-center gap-2 uppercase tracking-wide text-sm"><i data-lucide="rocket" class="text-${alertColor}-500 w-5 h-5"></i> แผนการสอนและพัฒนา (Auto-Generated)</h4>
+                        <div class="p-4 bg-${alertColor}-50/50 rounded-xl border border-${alertColor}-100">${actionPlan}</div>
                     </div>
                 </div>
             `;
-            document.getElementById('bp-content').innerHTML = content;
-            lucide.createIcons(); 
-            
-            document.getElementById('modal-blueprint').classList.remove('hidden');
-            document.getElementById('modal-blueprint').classList.add('flex');
+            lucide.createIcons();
+            document.getElementById('modal-blueprint').classList.remove('hidden'); document.getElementById('modal-blueprint').classList.add('flex');
         }
 
-        function openSettings() {
-            document.getElementById('pass-criteria').value = state.passCriteria;
-            document.getElementById('modal-settings').classList.remove('hidden');
-            document.getElementById('modal-settings').classList.add('flex');
-        }
+        function openSettings() { document.getElementById('pass-criteria').value = state.passCriteria; document.getElementById('modal-settings').classList.remove('hidden'); document.getElementById('modal-settings').classList.add('flex'); }
+        function saveSettings() { state.passCriteria = parseFloat(document.getElementById('pass-criteria').value) || 50; closeModal('modal-settings'); applyFilterAndRender(); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
-        function saveSettings() {
-            state.passCriteria = parseFloat(document.getElementById('pass-criteria').value) || 50;
-            closeModal('modal-settings');
-            applyFilterAndRender();
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            document.getElementById(id).classList.remove('flex');
-        }
-
-        // Initialize App
+        // Start Fetch process on load
         window.onload = loadData;
-
     </script>
 </body>
 </html>
