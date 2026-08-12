@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 V.2.1 | โรงเรียน ส.ว.</title>
+    <title>ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 V.2.2 | โรงเรียน ส.ว.</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -49,8 +49,8 @@
                     <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 <span class="text-[10px] font-black bg-brand-100 text-brand-700 px-2 py-0.5 rounded-md ml-1.5 border border-brand-200 align-text-bottom">V.2.1</span></h1>
-                    <p class="text-xs text-slate-500 font-medium">โครงการ Fast Track - พฤษภาคม 2569 (ส.ว.)</p>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 <span class="text-[10px] font-black bg-brand-100 text-brand-700 px-2 py-0.5 rounded-md ml-1.5 border border-brand-200 align-text-bottom">V.2.2</span></h1>
+                    <p class="text-xs text-slate-500 font-medium">โครงการ Fast Track 2569 (ส.ว.)</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
@@ -88,8 +88,8 @@
                     </div>
                     <div class="flex gap-2 w-full sm:w-auto">
                         <button onclick="setRoundView('round1')" id="btn-round-1" class="round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">📊 รอบแรก</button>
-                        <button onclick="setRoundView('round2')" id="btn-round-2" class="round-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">📊 รอบสอง</button>
-                        <button onclick="setRoundView('compare')" id="btn-round-cmp" class="round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-amber-300 text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 transition-all shadow-sm">⚖️ เทียบพัฒนาการ</button>
+                        <button onclick="setRoundView('round2')" id="btn-round-2" class="round-btn flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium transition-all hover:bg-slate-50 shadow-sm">📊 รอบสอง</button>
+                        <button onclick="setRoundView('compare')" id="btn-round-cmp" class="round-btn active flex-1 sm:flex-none px-4 py-2 rounded-lg border border-amber-300 text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 transition-all shadow-sm">⚖️ เทียบพัฒนาการ</button>
                     </div>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                         <div class="bg-rose-100 p-3.5 rounded-full text-rose-600 border border-rose-200"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
                         <div>
                             <p class="text-sm text-slate-500 font-medium">วิชาที่ควรปรับปรุงเร่งด่วน</p>
-                            <h3 id="kpi-weakest" class="text-xl font-extrabold text-slate-800 mt-0.5 truncate max-w-[180px]">--</h3>
+                            <h3 id="kpi-weakest" class="text-xl font-extrabold text-slate-800 mt-0.5 leading-tight text-wrap">--</h3>
                         </div>
                     </div>
                 </div>
@@ -209,7 +209,7 @@
                                     <th class="px-5 py-4 sortable hover:text-brand-600 transition-colors" onclick="sortTable('stream')">สายการเรียน <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
                                     <th class="px-5 py-4 sortable hover:text-brand-600 transition-colors" onclick="sortTable('totalScore')">คะแนนรวม <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
                                     <th class="px-5 py-4 sortable hover:text-brand-600 transition-colors" onclick="sortTable('percent')">ร้อยละ (%) <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
-                                    <th id="th-dev" class="px-5 py-4 sortable hidden bg-amber-50 text-amber-700 hover:text-amber-900 transition-colors" onclick="sortTable('diffPercent')">พัฒนาการ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-amber-500"></i></th>
+                                    <th id="th-dev" class="px-5 py-4 sortable bg-amber-50 text-amber-700 hover:text-amber-900 transition-colors" onclick="sortTable('diffPercent')">พัฒนาการ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-amber-500"></i></th>
                                     <th class="px-5 py-4 sortable hover:text-brand-600 transition-colors" onclick="sortTable('status')">สถานะ <i data-lucide="arrow-up-down" class="inline w-3 h-3 text-slate-400"></i></th>
                                     <th class="px-5 py-4 text-right">การจัดการ</th>
                                 </tr>
@@ -322,7 +322,7 @@
         
         let state = {
             filter: 'all',       // 'all', 'science', 'art'
-            roundView: 'round2', // 'round1', 'round2', 'compare'
+            roundView: 'compare', // Default set to compare
             passCriteria: 30,
             sortCol: 'percent',
             sortAsc: false
@@ -349,8 +349,8 @@
                     wbMaster.SheetNames.forEach(sheetName => {
                         const sheetData = XLSX.utils.sheet_to_json(wbMaster.Sheets[sheetName], { defval: "" });
                         
-                        // Smart Room Extraction from Sheet name (e.g., "601" or fallback)
-                        let defaultRoom = sheetName.match(/6\d{2}/) ? sheetName.match(/6\d{2}/)[0] : '-';
+                        // Smart Room Extraction from Sheet name (Only 601-613)
+                        let defaultRoom = sheetName.match(/60[1-9]|61[0-3]/) ? sheetName.match(/60[1-9]|61[0-3]/)[0] : '-';
                         
                         sheetData.forEach(row => {
                             let id = findValueByKeyword(row, ['รหัส', 'เลขประจำตัว']);
@@ -358,8 +358,14 @@
                             let surname = findValueByKeyword(row, ['สกุล', 'นามสกุล']) || '';
                             let roomCol = findValueByKeyword(row, ['ห้อง', 'ชั้น']);
                             
-                            let room = roomCol ? String(roomCol).replace(/[^\d]/g, '') : defaultRoom;
-                            if(!room || room.length === 0) room = defaultRoom;
+                            let room = '-';
+                            if (roomCol) {
+                                let matched = String(roomCol).match(/60[1-9]|61[0-3]/);
+                                if(matched) room = matched[0];
+                            }
+                            if (room === '-' && defaultRoom !== '-') {
+                                room = defaultRoom;
+                            }
 
                             if (!id || !name || String(id).includes('เลข') || String(id).includes('รหัส')) return;
 
@@ -404,7 +410,7 @@
 
                 if(unifiedStudents.size === 0) throw new Error("No data parsed from files.");
 
-                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> อัปเดตข้อมูล V.2.1 สำเร็จ';
+                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> อัปเดตข้อมูล V.2.2 สำเร็จ';
                 statusEl.className = 'px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-emerald-200 shadow-sm';
 
             } catch (error) {
