@@ -50,7 +50,7 @@
                     <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 <span class="text-[10px] font-black bg-brand-100 text-brand-700 px-2 py-0.5 rounded-md ml-1.5 border border-brand-200 align-text-bottom">V.2.5</span></h1>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">ระบบสรุปผลการสอบ Pre-Test TCAS ม.6 <span class="text-[10px] font-black bg-brand-100 text-brand-700 px-2 py-0.5 rounded-md ml-1.5 border border-brand-200 align-text-bottom">V.2.6</span></h1>
                     <p class="text-xs text-slate-500 font-medium">โครงการ Fast Track 2569 (ส.ว.)</p>
                 </div>
             </div>
@@ -105,7 +105,7 @@
                     <i data-lucide="pie-chart" class="w-4 h-4"></i> ผลสัมฤทธิ์รายวิชา
                 </button>
                 <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn pb-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 whitespace-nowrap">
-                    <i data-lucide="users" class="w-4 h-4"></i> บัญชีรายชื่อห้องสอบ
+                    <i data-lucide="users" class="w-4 h-4"></i> บัญชีรายชื่อ
                 </button>
             </div>
 
@@ -143,7 +143,7 @@
                         <i data-lucide="brain-circuit" class="w-64 h-64 text-indigo-200"></i>
                     </div>
                     <h3 class="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2 relative z-10">
-                        <i data-lucide="lightbulb" class="w-5 h-5"></i> บทวิเคราะห์และยุทธศาสตร์การพัฒนา V.2.5
+                        <i data-lucide="lightbulb" class="w-5 h-5"></i> บทวิเคราะห์และยุทธศาสตร์การพัฒนา V.2.6
                     </h3>
                     <div id="dynamic-strategy-content" class="relative z-10">
                         <p class="text-slate-300 text-sm flex items-center gap-2"><i data-lucide="loader" class="w-4 h-4 animate-spin"></i> กำลังประมวลผลยุทธศาสตร์...</p>
@@ -240,7 +240,7 @@
                 </div>
                 
                 <div class="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
-                    <!-- Advanced V.2.5 Scoreboard -->
+                    <!-- Advanced V.2.6 Scoreboard -->
                     <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100 w-full md:w-auto">
                         <div class="px-3 py-1 text-center">
                             <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">รอบ 1</p>
@@ -266,7 +266,7 @@
                 <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bar-chart-2" class="text-brand-500 w-5 h-5"></i> กราฟเปรียบเทียบคะแนนรายวิชา (จากเต็ม 100)</h4>
                 <div class="h-[280px] relative w-full"><canvas id="studentBarChart"></canvas></div>
                 
-                <!-- Prediction Section V.2.5 -->
+                <!-- Prediction Section V.2.6 -->
                 <div class="mt-8 border-t border-slate-100 pt-6">
                     <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="compass" class="text-brand-500 w-5 h-5"></i> สาขาที่น่าสนใจ</h4>
                     <div id="st-prediction" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -307,7 +307,7 @@
         Chart.defaults.font.family = "'Sarabun', 'Inter', sans-serif";
         Chart.defaults.plugins.datalabels = { display: false }; 
 
-        // Constant subject mapping (covering diverse naming conventions)
+        // Constant subject mapping
         const SUBJECTS = {
             'math': { name: 'คณิตศาสตร์', keys: ['รวมคณิต', 'คณิต'], emoji: '📐', color: '#3b82f6', hex: '59,130,246' },
             'thai': { name: 'ภาษาไทย', keys: ['ภาษาไทย', 'ไทย'], emoji: '🇹🇭', color: '#f59e0b', hex: '245,158,11' },
@@ -322,7 +322,6 @@
         // Master Data Map
         let unifiedStudents = new Map();
         
-        // Defaults to 'compare' and 'all' as requested
         let state = {
             filter: 'all', 
             roundView: 'compare', 
@@ -332,42 +331,43 @@
         };
         let charts = {};
 
-        // Fallback Demo Data for Preview Environments (V.2.5 Perfect Mapping)
-        const demoMaster = `รหัสผู้สอบ,เลขที่,ห้อง,ชื่อ,สกุล
-29141,1,601,นางสาววิภาดา,โก
-29168,2,602,นางสาวจรัสวดี,บัวตูม
-29119,1,610,นายนฤภัทร,ปวนลุน
-29139,2,612,นางสาวฟ้าใส,ไชยวรรณ์
-88888,99,601,นายนิว,แมน
-29202,14,605,นางสาวณัฎฐณิชา,ปัญญา
-31020,21,608,นายศิวกร,ศรีคำหน้อย
-29308,5,602,นายปุณยวัจน์,ชีวีนิธิสกุล
-29220,27,610,นางสาวรมิดา,สิทธิชาติ`;
+        // Fallback Demo Data for Preview Environments (V.2.6 Perfect Mapping)
+        const demoMaster = `รหัส,ห้อง,เลขที่,คำนำหน้า,ชื่อ,สกุล
+29141,601,1,นางสาว,วิภาดา,โก
+29168,602,2,นางสาว,จรัสวดี,บัวตูม
+29119,610,1,นาย,นฤภัทร,ปวนลุน
+29139,612,2,นางสาว,ฟ้าใส,ไชยวรรณ์
+88888,601,99,นาย,นิว,แมน
+29202,605,14,นางสาว,ณัฎฐณิชา,ปัญญา
+31020,608,21,นาย,ศิวกร,ศรีคำหน้อย
+29308,602,5,นาย,ปุณยวัจน์,ชีวีนิธิสกุล
+29220,610,27,นางสาว,รมิดา,สิทธิชาติ
+29482,605,22,นางสาว,พิมพ์วิภา,ขันคำ`;
 
         const demoR1_Sci = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,รวมคณิต,ชีวะ,รวมชีวะ,ฟิสิกส์,รวมฟิสิกส์,ไทย,สังคม,เคมี,ภาษาอังกฤษ
-29141,1,นางสาววิภาดา,โก,15,45,12,60,15,50,40,65,58,60
-29168,2,นางสาวจรัสวดี,บัวตูม,12,30,17,40,6,20,42,40,30,35
-29202,14,นางสาวณัฎฐณิชา,ปัญญา,20,60,20,60,20,60,50,50,50,50
-31020,21,นายศิวกร,ศรีคำหน้อย,30,70,25,80,30,75,65,60,70,80
-29308,5,นายปุณยวัจน์,ชีวีนิธิสกุล,10,20,10,20,10,20,30,30,20,30`;
+29141,1,วิภาดา,โก,15,45,12,60,15,50,40,65,58,60
+29168,2,จรัสวดี,บัวตูม,12,30,17,40,6,20,42,40,30,35
+29202,14,ณัฎฐณิชา,ปัญญา,20,60,20,60,20,60,50,50,50,50
+31020,21,ศิวกร,ศรีคำหน้อย,30,70,25,80,30,75,65,60,70,80
+29308,5,ปุณยวัจน์,ชีวีนิธิสกุล,10,20,10,20,10,20,30,30,20,30`;
 
         const demoR2_Sci = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,อังกฤษ,สังคม,ภาษาไทย,เคมี,ฟิสิกส์,ชีววิทยา
-29141,1,นางสาววิภาดา,โก,55,75,80,50,60,55,70
-29168,2,นางสาวจรัสวดี,บัวตูม,20,30,35,40,25,15,30
-88888,99,นายนิว,แมน,80,80,80,80,80,80,80
-29202,14,นางสาวณัฎฐณิชา,ปัญญา,65,60,55,55,55,65,70
-31020,21,นายศิวกร,ศรีคำหน้อย,75,85,65,70,75,80,85
-29308,5,นายปุณยวัจน์,ชีวีนิธิสกุล,25,35,35,40,25,25,30`;
+29141,1,วิภาดา,โก,55,75,80,50,60,55,70
+29168,2,จรัสวดี,บัวตูม,20,30,35,40,25,15,30
+88888,99,นิว,แมน,80,80,80,80,80,80,80
+29202,14,ณัฎฐณิชา,ปัญญา,65,60,55,55,55,65,70
+31020,21,ศิวกร,ศรีคำหน้อย,75,85,65,70,75,80,85
+29308,5,ปุณยวัจน์,ชีวีนิธิสกุล,25,35,35,40,25,25,30`;
 
         const demoR1_Art = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,รวมคณิต,ภาษาไทย,สังคม,ภาษาอังกฤษ,วิทย์
-29119,1,นายนฤภัทร,ปวนลุน,12,30,28,32,59,26
-29139,2,นางสาวฟ้าใส,ไชยวรรณ์,30,50,42,26,44,26
-29220,27,นางสาวรมิดา,สิทธิชาติ,25,60,50,45,65,40`;
+29119,1,นฤภัทร,ปวนลุน,12,30,28,32,59,26
+29139,2,ฟ้าใส,ไชยวรรณ์,30,50,42,26,44,26
+29220,27,รมิดา,สิทธิชาติ,25,60,50,45,65,40`;
 
         const demoR2_Art = `รหัสผู้สอบ,เลขที่,ชื่อ, สกุล,คณิต,อังกฤษ,สังคม,วิทย์ประยุกต์,ภาษาไทย
-29119,1,นายนฤภัทร,ปวนลุน,40,70,50,30,40
-29139,2,นางสาวฟ้าใส,ไชยวรรณ์,35,40,20,20,40
-29220,27,นางสาวรมิดา,สิทธิชาติ,65,75,55,45,60`;
+29119,1,นฤภัทร,ปวนลุน,40,70,50,30,40
+29139,2,ฟ้าใส,ไชยวรรณ์,35,40,20,20,40
+29220,27,รมิดา,สิทธิชาติ,65,75,55,45,60`;
 
         // --- STREAMING_CHUNK:Data loading and extraction logic... ---
         async function loadData() {
@@ -422,7 +422,7 @@
                     } else throw new Error();
                 } catch(e) { processScoreJSON(Papa.parse(demoR2_Art, { header: true }).data, 'r2'); }
 
-                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ฐานข้อมูล V.2.5 สมบูรณ์';
+                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ฐานข้อมูล V.2.6 สมบูรณ์';
                 statusEl.className = 'px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-emerald-200 shadow-sm';
 
             } catch (error) {
@@ -434,22 +434,23 @@
             applyFilterAndRender();
         }
 
-        // Advanced Worksheet Parser (V.2.5 Smart Room Extraction)
+        // Advanced Worksheet Parser (V.2.6 Full Prefix Extraction)
         function processMasterListWorksheet(worksheet, sheetName) {
             let rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
             
-            let idCol = -1, nameCol = -1, surnameCol = -1, roomCol = -1, noCol = -1;
+            let idCol = -1, roomCol = -1, noCol = -1, prefixCol = -1, nameCol = -1, surnameCol = -1;
             let headerRowIdx = -1;
             
             // Scan for headers in first 5 rows
             for(let r=0; r<Math.min(5, rows.length); r++) {
                 for(let c=0; c<rows[r].length; c++) {
-                    let val = String(rows[r][c]).trim().toLowerCase();
-                    if(val.includes('รหัส') || val.includes('เลขประจำตัว')) idCol = c;
-                    if(val === 'ชื่อ' || val.includes('ชื่อ')) nameCol = c;
-                    if(val.includes('สกุล')) surnameCol = c;
-                    if(val === 'ห้อง' || val === 'ชั้น' || val.includes('ห้อง')) roomCol = c;
+                    let val = String(rows[r][c]).trim().replace(/\s+/g, '').toLowerCase();
+                    if(val === 'รหัส' || val === 'รหัสประจำตัว' || val === 'รหัสนักเรียน' || val === 'รหัสผู้สอบ') idCol = c;
+                    if(val === 'ห้อง' || val === 'ชั้น') roomCol = c;
                     if(val === 'เลขที่' || val === 'ลำดับ' || val === 'no') noCol = c;
+                    if(val === 'คำนำหน้า' || val === 'คำนำหน้าชื่อ') prefixCol = c;
+                    if(val === 'ชื่อ' || val === 'ชื่อนักเรียน') nameCol = c;
+                    if(val === 'สกุล' || val === 'นามสกุล') surnameCol = c;
                 }
                 if(idCol !== -1 && nameCol !== -1) {
                     headerRowIdx = r;
@@ -459,33 +460,28 @@
 
             if(idCol === -1 || nameCol === -1) return;
 
-            // Fallback: If room column not found, try to guess from Sheet Name
-            let fallbackRoom = '-';
-            let sheetRoomMatch = sheetName.match(/6\/?(0[1-9]|1[0-3])/); // Matches 601, 6/1, 6/13, 613 etc.
-            if(sheetRoomMatch) {
-                fallbackRoom = "6" + sheetRoomMatch[1].padStart(2, '0');
-            }
-
             // Extract students row by row
             for(let r = headerRowIdx + 1; r < rows.length; r++) {
                 let row = rows[r];
                 let id = row[idCol];
-                let name = row[nameCol];
-                let surname = surnameCol !== -1 ? row[surnameCol] : '';
+                let prefix = prefixCol !== -1 ? String(row[prefixCol] || '').trim() : '';
+                let name = String(row[nameCol] || '').trim();
+                let surname = surnameCol !== -1 ? String(row[surnameCol] || '').trim() : '';
                 
                 if (!id || !name || String(id).includes('รหัส')) continue;
                 
                 let key = String(id).trim();
-                let fullName = `${name} ${surname}`.trim().replace('(ขาด)', '');
                 
-                // Hardcoded name fixes
-                if (fullName.includes("นฤภัทร ปวนลุน") && !fullName.startsWith("นาย")) fullName = "นายนฤภัทร ปวนลุน";
+                // Construct Full Name: PrefixName Surname
+                let fullName = (prefix + name).trim();
+                if(surname) fullName += " " + surname;
+                fullName = fullName.replace('(ขาด)', '').trim();
                 
-                let assignedRoom = fallbackRoom;
+                let assignedRoom = '-';
                 if(roomCol !== -1 && row[roomCol]) {
                     let rVal = String(row[roomCol]).trim();
                     let m = rVal.match(/6\/?(0[1-9]|1[0-3])/);
-                    if(m) assignedRoom = "6" + m[1].padStart(2, '0');
+                    assignedRoom = m ? "6" + m[1].padStart(2, '0') : rVal;
                 }
 
                 let studentNo = 999;
@@ -493,9 +489,10 @@
                     studentNo = parseInt(row[noCol]) || 999;
                 }
 
+                // สร้างฐานข้อมูลเริ่มต้นรอรับคะแนน
                 unifiedStudents.set(key, {
                     id: key, name: fullName, room: assignedRoom, no: studentNo,
-                    stream: 'science', // Temp default
+                    stream: 'science', // Temp default จะถูกเปลี่ยนตอนดึงไฟล์คะแนน
                     r1Obj: null, r2Obj: null
                 });
             }
@@ -516,15 +513,20 @@
 
             data.forEach(row => {
                 let id = findValueByKeyword(row, ['รหัส', 'เลขประจำตัว']);
+                let prefix = findValueByKeyword(row, ['คำนำหน้า']) || '';
                 let name = findValueByKeyword(row, ['ชื่อ']);
                 let surname = findValueByKeyword(row, ['สกุล', 'นามสกุล']) || '';
                 let roomCol = findValueByKeyword(row, ['ห้อง', 'ชั้น']) || '-';
                 let noCol = findValueByKeyword(row, ['เลขที่', 'ลำดับ', 'no']) || '999';
                 
                 if (!id || !name || String(id).includes('รหัส')) return;
+                
                 let key = String(id).trim();
-                let fullName = `${name} ${surname}`.trim().replace('(ขาด)', '');
-                if (fullName.includes("นฤภัทร ปวนลุน") && !fullName.startsWith("นาย")) fullName = "นายนฤภัทร ปวนลุน";
+                
+                // Combine prefix, name and surname
+                let fullName = (String(prefix).trim() + String(name).trim()).trim();
+                if(surname) fullName += " " + String(surname).trim();
+                fullName = fullName.replace('(ขาด)', '');
 
                 let rMatch = roomCol.match(/6\/?(0[1-9]|1[0-3])/);
                 let cleanRoom = rMatch ? "6" + rMatch[1].padStart(2, '0') : roomCol;
@@ -574,22 +576,16 @@
                 if (!id) return;
                 let key = String(id).trim();
 
+                // If not in master list, create a basic entry (fallback)
                 if (!unifiedStudents.has(key)) {
                     let surname = findValueByKeyword(row, ['สกุล']) || '';
                     let fullName = `${name || 'Unknown'} ${surname}`.trim().replace('(ขาด)', '');
-                    if (fullName.includes("นฤภัทร ปวนลุน") && !fullName.startsWith("นาย")) fullName = "นายนฤภัทร ปวนลุน";
                     unifiedStudents.set(key, { id: key, name: fullName, room: '-', no: 999, stream: streamStr, r1Obj: null, r2Obj: null });
                 }
 
                 let student = unifiedStudents.get(key);
                 student.stream = streamStr; 
                 
-                // Optional: update No if missing
-                if(student.no === 999) {
-                    let parseNo = parseInt(findValueByKeyword(row, ['เลขที่']));
-                    if(parseNo) student.no = parseNo;
-                }
-
                 let scoreObj = { scores: {}, totalScore: 0, maxScore: maxSubjects * 100, isMissing: false, percent: 0 };
                 let sum = 0, hasAnyScore = false;
 
@@ -970,16 +966,18 @@
         function renderTable() {
             const tbody = document.getElementById('student-tbody');
             tbody.innerHTML = '';
-            let students = getActiveStudentsList();
-            const search = document.getElementById('search-student').value.toLowerCase();
             
+            // Get students and STRICTLY REMOVE Absentees (missing entirely from view)
+            let students = getActiveStudentsList().filter(s => !s.isMissing);
+            
+            const search = document.getElementById('search-student').value.toLowerCase();
             if(search) {
                 students = students.filter(s => s.name.toLowerCase().includes(search) || s.id.toString().includes(search) || s.room.toLowerCase().includes(search));
             }
 
             students.sort((a,b) => {
                 let vA = a[state.sortCol], vB = b[state.sortCol];
-                if (state.sortCol === 'status') { vA = a.isMissing?0:(a.percent>=state.passCriteria?2:1); vB = b.isMissing?0:(b.percent>=state.passCriteria?2:1); }
+                if (state.sortCol === 'status') { vA = a.percent>=state.passCriteria?2:1; vB = b.percent>=state.passCriteria?2:1; }
                 if (state.sortCol === 'room') { vA = parseInt(vA) || 0; vB = parseInt(vB) || 0; }
                 if(typeof vA === 'string') vA = vA.toLowerCase(); if(typeof vB === 'string') vB = vB.toLowerCase();
                 if(vA < vB) return state.sortAsc ? -1 : 1; if(vA > vB) return state.sortAsc ? 1 : -1; return 0;
@@ -992,8 +990,8 @@
                 let isSci = s.stream === 'science';
                 let streamBadge = `<span class="px-2.5 py-1 text-[11px] font-bold rounded-lg border ${isSci?'bg-sky-50 text-sky-700 border-sky-200':'bg-amber-50 text-amber-700 border-amber-200'}">${isSci?'วิทย์-คณิต':'สายศิลป์'}</span>`;
                 
-                let statusBadge = s.isMissing ? '<span class="px-2.5 py-1 bg-slate-100 text-slate-500 text-[11px] font-bold rounded-lg">ขาดสอบ</span>' : 
-                                  s.percent >= state.passCriteria ? '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold rounded-lg">ผ่านเกณฑ์</span>' : 
+                let statusBadge = s.percent >= state.passCriteria ? 
+                                  '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold rounded-lg">ผ่านเกณฑ์</span>' : 
                                   '<span class="px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 text-[11px] font-bold rounded-lg">ควรปรับปรุง</span>';
 
                 let devCol = '';
@@ -1018,8 +1016,8 @@
                     <td class="px-5 py-4 text-slate-500">${s.no}</td>
                     <td class="px-5 py-4 font-bold text-slate-900">${s.name}</td>
                     <td class="px-5 py-4">${streamBadge}</td>
-                    <td class="px-5 py-4 font-bold ${s.isMissing?'text-slate-400':'text-slate-800'}">${s.isMissing?'-':s.totalScore.toFixed(1)}</td>
-                    <td class="px-5 py-4 font-black ${s.isMissing?'text-slate-400':'text-brand-600'}">${s.isMissing?'-':s.percent.toFixed(2)+'%'}</td>
+                    <td class="px-5 py-4 font-bold text-slate-800">${s.totalScore.toFixed(1)}</td>
+                    <td class="px-5 py-4 font-black text-brand-600">${s.percent.toFixed(2)}%</td>
                     ${devCol}
                     <td class="px-5 py-4">${statusBadge}</td>
                     <td class="px-5 py-4 text-right"><button onclick="viewStudent('${s.id}')" class="text-[11px] font-bold bg-white border border-slate-200 hover:border-brand-500 hover:text-brand-600 px-3 py-1.5 rounded-lg shadow-sm transition-all group-hover:shadow-md flex items-center gap-1.5 ml-auto">ดูข้อมูล <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button></td>
@@ -1126,7 +1124,7 @@
                 }
             });
 
-            // --- V.2.5 CMU Faculty Prediction Logic (Colorful) ---
+            // --- V.2.6 CMU Faculty Prediction Logic (Colorful) ---
             let baseScore = student.r2Obj && !student.r2Obj.isMissing ? student.r2Obj : (student.r1Obj && !student.r1Obj.isMissing ? student.r1Obj : null);
             if(baseScore) {
                 let preds = [];
