@@ -240,7 +240,7 @@
                 </div>
                 
                 <div class="flex flex-col md:flex-row items-end md:items-center gap-4 w-full md:w-auto">
-                    <!-- Advanced V.2.6 Scoreboard -->
+                    <!-- Advanced V.2.7 Scoreboard -->
                     <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100 w-full md:w-auto">
                         <div class="px-3 py-1 text-center">
                             <p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">รอบ 1</p>
@@ -266,7 +266,7 @@
                 <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="bar-chart-2" class="text-brand-500 w-5 h-5"></i> กราฟเปรียบเทียบคะแนนรายวิชา (จากเต็ม 100)</h4>
                 <div class="h-[280px] relative w-full"><canvas id="studentBarChart"></canvas></div>
                 
-                <!-- Prediction Section V.2.6 -->
+                <!-- Prediction Section V.2.7 -->
                 <div class="mt-8 border-t border-slate-100 pt-6">
                     <h4 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wider flex items-center gap-2"><i data-lucide="compass" class="text-brand-500 w-5 h-5"></i> สาขาที่น่าสนใจ</h4>
                     <div id="st-prediction" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -330,7 +330,7 @@
         };
         let charts = {};
 
-        // Fallback Demo Data for Preview Environments (V.2.6 Perfect Mapping)
+        // Fallback Demo Data for Preview Environments (V.2.7 Perfect Mapping)
         const demoMaster = `รหัส,ห้อง,เลขที่,คำนำหน้า,ชื่อ,สกุล
 29141,601,1,นางสาว,วิภาดา,โก
 29168,602,2,นางสาว,จรัสวดี,บัวตูม
@@ -421,7 +421,7 @@
                     } else throw new Error();
                 } catch(e) { processScoreJSON(Papa.parse(demoR2_Art, { header: true }).data, 'r2'); }
 
-                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ฐานข้อมูล V.2.6 สมบูรณ์';
+                statusEl.innerHTML = '<i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ฐานข้อมูล V.2.7 สมบูรณ์';
                 statusEl.className = 'px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full flex items-center gap-1.5 border border-emerald-200 shadow-sm';
 
             } catch (error) {
@@ -433,7 +433,7 @@
             applyFilterAndRender();
         }
 
-        // Advanced Worksheet Parser (V.2.6 Full Prefix Extraction)
+        // Advanced Worksheet Parser (V.2.7 Full Prefix Extraction)
         function processMasterListWorksheet(worksheet, sheetName) {
             let rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
             
@@ -1171,7 +1171,7 @@
                 }
             });
 
-            // --- V.2.6 CMU Faculty Prediction Logic (Colorful) ---
+            // --- V.2.7 CMU Faculty Prediction Logic (Colorful) ---
             let baseScore = student.r2Obj && !student.r2Obj.isMissing ? student.r2Obj : (student.r1Obj && !student.r1Obj.isMissing ? student.r1Obj : null);
             if(baseScore) {
                 let preds = [];
